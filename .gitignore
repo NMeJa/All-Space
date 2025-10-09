@@ -1,0 +1,92 @@
+# =============== #
+# Rider Defaults  #
+# =============== #
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+
+# =============== #
+# IDE & Editors   #
+# =============== #
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+
+# =============== #
+# Blazor Specific #
+# =============== #
+
+# Auto-generated component styles - IMPORTANT!
+AllSpace.UI.styles.css
+**/wwwroot/**/*.styles.css
+
+# Blazor/Photino build outputs
+**/wwwroot/_framework/
+*.blazor.config
+
+# =============== #
+# LiteDB Database #
+# =============== #
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.litedb
+
+# =============== #
+# Security Files  #
+# =============== #
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+*.pfx
+*.key
+encryption-keys/
+master-password.txt
+
+# =============== #
+# OS Files        #
+# =============== #
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+._*
+
+# Linux
+*~
+
+# =============== #
+# Build & Publish #
+# =============== #
+publish/
+*.pubxml
+PublishProfiles/
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# =============== #
+# Logs & Temp     #
+# =============== #
+*.log
+logs/
+temp/
+tmp/
+
+# =============== #
+# User Data       #
+# =============== #
+user-settings.json
+workspace-configs/
+user-data/

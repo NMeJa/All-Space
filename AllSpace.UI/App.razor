@@ -1,0 +1,41 @@
+﻿<MudThemeProvider Theme="@theme" IsDarkMode="@isDarkMode"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <MudContainer>
+                <MudText Typo="Typo.h5">Page not found</MudText>
+                <MudText>Sorry, there's nothing at this address.</MudText>
+            </MudContainer>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    private bool isDarkMode = true;
+
+    private MudTheme theme = new()
+    {
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#2196f3",
+            Secondary = "#f50057",
+            AppbarBackground = "#1a1a1a",
+            Surface = "#2a2a2a",
+            Background = "#1a1a1a",
+            DrawerBackground = "#1a1a1a",
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DrawerWidthLeft = "260px",
+            DrawerMiniWidthLeft = "56px"
+        }
+    };
+
+}

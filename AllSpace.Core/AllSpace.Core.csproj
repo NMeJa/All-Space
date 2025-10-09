@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AllSpace.Data\AllSpace.Data.csproj" />
+      <ProjectReference Include="..\AllSpace.Domain\AllSpace.Domain.csproj" />
+      <ProjectReference Include="..\AllSpace.Security\AllSpace.Security.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
+      <PackageReference Include="Photino.NET" Version="4.0.16" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
+
+</Project>
