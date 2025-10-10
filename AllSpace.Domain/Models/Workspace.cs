@@ -36,8 +36,8 @@ public class Workspace(
 		// Priority 3: Default random icon
 		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
 			return new IconInfo(DefaultIconPath, IconType.Default);
-		//TODO Return Default Icon Question mark
-		return default;
+
+		return new IconInfo(IconConstants.DefaultWorkspaceIcon, IconType.SystemDefault);
 	}
 
 	// Factory methods

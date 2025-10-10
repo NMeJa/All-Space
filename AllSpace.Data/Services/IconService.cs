@@ -8,6 +8,7 @@ public interface IIconService
 	string GetRandomDefaultIcon();
 	string GetDefaultIconForService(string serviceName);
 	List<string> GetAllDefaultIcons();
+	Task<string> LoadSvgIcon(string svgPath);
 }
 
 public class IconService : IIconService
@@ -52,7 +53,7 @@ public class IconService : IIconService
 
 	private void CopyDefaultIconsFromResources()
 	{
-		// Copy embedded default icons to local folder
+		// Copy embedded default icons to the local folder
 		var assembly = Assembly.GetExecutingAssembly();
 		var resourceNames = assembly.GetManifestResourceNames()
 									.Where(name => name.Contains("DefaultIcons"));
@@ -114,4 +115,10 @@ public class IconService : IIconService
 	}
 
 	public List<string> GetAllDefaultIcons() => _defaultIcons.ToList();
+
+	public async Task<string> LoadSvgIcon(string svgPath)
+	{
+		var result = await File.ReadAllTextAsync(svgPath);
+		return result;
+	}
 }

@@ -1,17 +1,19 @@
 ﻿@inject Data.Services.IIconService IconService
+
 <div class="folder-wrapper flex-shrink-0">
-    @if (!isExpanded)
+    @if (!isExpanded || Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
     {
         <!-- Collapsed folder view -->
         <MudContainer Class="ma-0" Fixed="true" Gutters="false">
             <MudButton OnClick="@HandleToggle" Class="pa-0 ma-0">
                 <MudPaper Class="pa-2 folder-item" Elevation="0"
                           Width="55" Height="55">
-                    @if (icon != null) //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
+                    @if (icon.Type != IconType.SystemDefault)
                     {
-                        <!-- Custom folder icon -->
-                        <MudIcon Icon="@($"file:///{icon.Path.Replace('\\', '/')}")" Class="folder-icon"
-                                 Title="@Folder.Name"/>
+                        //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
+                        <AsyncIcon IconPath="@icon.Path"
+                                   Class="folder-icon"
+                                   Title="@Folder.Name"/>
                     }
                     else
                     {
@@ -19,19 +21,19 @@
                         <div Class="folder-grid">
                             @foreach (var workspace in Workspaces.Take(4))
                             {
-                                //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
                                 var wsIcon = workspace.GetIcon();
-                                if (wsIcon != null)
+                                if (wsIcon.Type != IconType.SystemDefault)
                                 {
-                                    <img src="@($"file:///{wsIcon.Path.Replace('\\', '/')}")"
-                                         alt=""
-                                         class="workspace-icon-mini"/>
+                                    //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
+                                    <AsyncIcon IconPath="@icon.Path"
+                                               Class="workspace-icon-mini"
+                                               Title="@workspace.Name"/>
                                 }
                                 else
                                 {
                                     <div class="workspace-placeholder"
                                          style="background-color: @workspace.BackgroundColor;">
-                                        <span class="workspace-initial-mini">@workspace.Name[0]</span>
+                                        <span class="workspace-initial-mini">@workspace.Name[..1]</span>
                                     </div>
                                 }
                             }
@@ -62,16 +64,20 @@
                             <MudPaper Class="workspace-item-mini" Elevation="0"
                                       Style="@($"background-color: {workspace.BackgroundColor}")">
                                 @{
-                                    var icon = workspace.GetIcon(); //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
-                                    if (icon != null)
+                                    var wsIcon = workspace.GetIcon();
+                                    if (wsIcon.Type != IconType.SystemDefault)
                                     {
-                                        <MudIcon Icon="@($"file:///{icon.Path.Replace('\\', '/')}")"
-                                                 Class="workspace-icon-expanded"
-                                                 Title="@workspace.Name"/>
+                                        //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
+                                        <AsyncIcon IconPath="@icon.Path"
+                                                   Class="workspace-icon-expanded"
+                                                   Title="@workspace.Name"/>
                                     }
                                     else
                                     {
-                                        <span class="workspace-initial">@workspace.Name[0]</span>
+                                        <div class="workspace-placeholder"
+                                             style="background-color: @workspace.BackgroundColor;">
+                                            <span class="workspace-initial-mini">@workspace.Name[..1]</span>
+                                        </div>
                                     }
                                 }
                             </MudPaper>

@@ -29,8 +29,7 @@ public class WorkspaceFolder(
 		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
 			return new IconInfo(DefaultIconPath, IconType.Default);
 
-		//TODO Return Default Icon Question mark
-		return default;
+		return new IconInfo(IconConstants.DefaultFolderIcon, IconType.SystemDefault);
 	}
 
 	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN,

@@ -1,0 +1,26 @@
+﻿@inject Data.Services.IIconService IconService
+
+@if (!string.IsNullOrEmpty(loadedIcon))
+{
+    <MudIcon Icon="@loadedIcon" Class="@Class" Title="@Title"/>
+}
+else if (ShowLoader)
+{
+    <MudProgressCircular Size="Size.Small" Indeterminate="true"/>
+}
+
+@code {
+    [Parameter] public string IconPath { get; set; } = string.Empty;
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public bool ShowLoader { get; set; } = true;
+
+    private string? loadedIcon;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(IconPath))
+            loadedIcon = await IconService.LoadSvgIcon(IconPath);
+    }
+
+}
