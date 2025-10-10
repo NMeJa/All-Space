@@ -1,2 +1,27 @@
 ﻿@inherits LayoutComponentBase
-<Home/>
+<MudLayout>
+    <div class="app-container">
+        <ASSidebar Folders="@Folders"
+                   Workspaces="@Workspaces"
+                   ActiveWorkspaceId="@ActiveWorkspaceId"
+                   OnWorkspaceClick="HandleWorkspaceClick"
+                   OnFolderClick="HandleFolderClick"/>
+
+        <ASWebview ActiveWorkspace="@ActiveWorkspace"
+                   ActiveWorkspaceId="@ActiveWorkspaceId"/>
+    </div>
+</MudLayout>
+
+<style>
+    .main-layout {
+        padding: 0;
+        background-color: #ffffff;
+    }
+
+    .app-container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+    }
+
+</style>

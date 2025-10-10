@@ -29,6 +29,14 @@ public record AuthProfile(
 
 	public AuthProfile RemoveCredential(string key)
 		=> this with { EncryptedCredentials = EncryptedCredentials.Remove(key) };
+
+	public record struct Providers
+	{
+		public static string Google => "Google";
+		public static string Microsoft => "Microsoft";
+		public static string Slack => "Slack";
+		public static string Custom => "Custom";
+	}
 }
 
 /*

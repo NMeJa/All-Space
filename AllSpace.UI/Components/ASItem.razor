@@ -30,3 +30,42 @@
     }
 
 }
+
+<style>
+    .item-container {
+        position: relative;
+        width: 56px;
+        height: 56px;
+    }
+
+    .active-indicator {
+        position: absolute;
+        left: -12px;
+        top: 8px;
+        width: 4px;
+        height: 40px;
+        background-color: white;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .item {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background-color: #ea4335;
+        cursor: pointer;
+        transition: border-radius 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .item:hover {
+        border-radius: 16px;
+    }
+
+    .item.active {
+        border-radius: 16px;
+    }
+
+</style>
