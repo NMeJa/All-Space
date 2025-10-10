@@ -7,40 +7,51 @@ public class WorkspaceFolder(
 	string id,
 	string name,
 	WorkspaceFolder.FolderType type,
-	ImmutableList<AppInfo> apps) : ISidebarItem
+	ImmutableList<Workspace> workspaces,
+	string? customIconPath = null,
+	string? defaultIconPath = null)
+	: ISidebarItem
 {
 	public string Id { get; set; } = id;
 	public string Name { get; set; } = name;
 	public FolderType Type { get; set; } = type;
-	public ImmutableList<AppInfo> Apps { get; set; } = apps;
+	public ImmutableList<Workspace> Workspaces { get; set; } = workspaces;
+	public string? CustomIconPath { get; set; } = customIconPath;
+	public string? DefaultIconPath { get; set; } = defaultIconPath;
 	public int Order { get; set; } = Random.Shared.Next(0, 100);
 
-	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN, params AppInfo[] apps)
-		=> new(id, name, type, apps?.ToImmutableList() ?? ImmutableList<AppInfo>.Empty);
+	// Get icon with priority: Custom > Default > null (show grid)
+	public IconInfo GetIcon()
+	{
+		if (!string.IsNullOrEmpty(CustomIconPath) && File.Exists(CustomIconPath))
+			return new IconInfo(CustomIconPath, IconType.Custom);
+
+		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
+			return new IconInfo(DefaultIconPath, IconType.Default);
+
+		//TODO Return Default Icon Question mark
+		return default;
+	}
+
+	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN,
+										 string? customIconPath = null,
+										 string? defaultIconPath = null,
+										 params Workspace[] workspaces)
+		=> new(id, name, type, workspaces?.ToImmutableList() ?? ImmutableList<Workspace>.Empty,
+			   customIconPath, defaultIconPath);
 
 	public static WorkspaceFolder Empty(string id, string name, FolderType type = FolderType.DROPDOWN)
-		=> new(id, name, type, ImmutableList<AppInfo>.Empty);
+		=> new(id, name, type, ImmutableList<Workspace>.Empty);
 
-	public WorkspaceFolder AddApp(AppInfo app)
+	public WorkspaceFolder AddWorkspace(Workspace workspace)
 	{
-		Apps = Apps.Add(app);
+		Workspaces = Workspaces.Add(workspace);
 		return this;
 	}
 
-	public WorkspaceFolder RemoveApp(string appId)
+	public WorkspaceFolder RemoveWorkspace(string workspaceId)
 	{
-		Apps = Apps.RemoveAll(a => a.Id == appId);
-		return this;
-	}
-
-	public WorkspaceFolder UpdateApp(string appId, Func<AppInfo, AppInfo> updater)
-	{
-		var index = Apps.FindIndex(a => a.Id == appId);
-		if (index >= 0)
-		{
-			Apps = Apps.SetItem(index, updater(Apps[index]));
-		}
-
+		Workspaces = Workspaces.RemoveAll(w => w.Id == workspaceId);
 		return this;
 	}
 
@@ -51,6 +62,7 @@ public class WorkspaceFolder(
 		SIDEBAR
 	}
 }
+
 
 /*
  *	var productivityFolder = WorkspaceFolder.Create(

@@ -1,4 +1,5 @@
-﻿<div class="folder-wrapper flex-shrink-0">
+﻿@inject Data.Services.IIconService IconService
+<div class="folder-wrapper flex-shrink-0">
     @if (!isExpanded)
     {
         <!-- Collapsed folder view -->
@@ -6,28 +7,45 @@
             <MudButton OnClick="@HandleToggle" Class="pa-0 ma-0">
                 <MudPaper Class="pa-2 folder-item" Elevation="0"
                           Width="55" Height="55">
-                    <div Class="folder-grid">
-                        @foreach (var app in Apps.Take(4))
-                        {
-                            <div class="app-icon font-monospace d-flex rounded-circle align-items-center justify-content-center"
-                                 style="background-color: @app.Color;">
-                                @if (!string.IsNullOrEmpty(app.Icon))
+                    @if (icon != null) //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
+                    {
+                        <!-- Custom folder icon -->
+                        <MudIcon Icon="@($"file:///{icon.Path.Replace('\\', '/')}")" Class="folder-icon"
+                                 Title="@Folder.Name"/>
+                    }
+                    else
+                    {
+                        <!-- Grid showing workspace icons -->
+                        <div Class="folder-grid">
+                            @foreach (var workspace in Workspaces.Take(4))
+                            {
+                                //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
+                                var wsIcon = workspace.GetIcon();
+                                if (wsIcon != null)
                                 {
-                                    <span class="app-emoji">@app.Icon</span>
+                                    <img src="@($"file:///{wsIcon.Path.Replace('\\', '/')}")"
+                                         alt=""
+                                         class="workspace-icon-mini"/>
                                 }
-                            </div>
-                        }
-                    </div>
+                                else
+                                {
+                                    <div class="workspace-placeholder"
+                                         style="background-color: @workspace.BackgroundColor;">
+                                        <span class="workspace-initial-mini">@workspace.Name[0]</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
                 </MudPaper>
             </MudButton>
         </MudContainer>
     }
-    @* ReSharper disable once ConvertIfStatementToSwitchStatement *@
-    else if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
+    else if (Folder.Type is WorkspaceFolder.FolderType.DROPDOWN or
+                            WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE)
     {
-        <!-- Expanded DROPDOWN folder view with workspace items -->
+        <!-- Expanded folder showing workspaces -->
         <MudPaper Class="expanded-container" Elevation="2">
-            <!-- Header with close button -->
             <div class="expanded-header">
                 <MudIconButton Icon="@Icons.Material.Filled.Close"
                                Size="Size.Small"
@@ -35,23 +53,26 @@
                                OnClick="@HandleToggle"/>
             </div>
 
-            <!-- Workspace items from apps -->
-            <div class="expanded-apps">
-                @foreach (var app in Apps)
+            <div class="expanded-workspaces">
+                @foreach (var workspace in Workspaces)
                 {
-                    <!-- Convert each app to a workspace-like item -->
-                    <MudTooltip Text="@app.Name" Placement="Placement.Right" Arrow="true">
-                        <MudButton OnClick="@(() => HandleAppClick(app))"
-                                   Class="pa-0 ma-0 app-button">
+                    <MudTooltip Text="@workspace.Name" Placement="Placement.Right" Arrow="true">
+                        <MudButton OnClick="@(() => HandleWorkspaceClick(workspace))"
+                                   Class="pa-0 ma-0 workspace-button">
                             <MudPaper Class="workspace-item-mini" Elevation="0"
-                                      Style="@($"background-color: {app.Color}")">
-                                @if (!string.IsNullOrEmpty(app.Icon))
-                                {
-                                    <span class="workspace-emoji-mini">@app.Icon</span>
-                                }
-                                else
-                                {
-                                    <span class="workspace-initial">@app.Name[0]</span>
+                                      Style="@($"background-color: {workspace.BackgroundColor}")">
+                                @{
+                                    var icon = workspace.GetIcon(); //TODO change so that I can check if the icon is default ? or not. Because in case of default ? icon, Should show the grid
+                                    if (icon != null)
+                                    {
+                                        <MudIcon Icon="@($"file:///{icon.Path.Replace('\\', '/')}")"
+                                                 Class="workspace-icon-expanded"
+                                                 Title="@workspace.Name"/>
+                                    }
+                                    else
+                                    {
+                                        <span class="workspace-initial">@workspace.Name[0]</span>
+                                    }
                                 }
                             </MudPaper>
                         </MudButton>
@@ -60,70 +81,51 @@
             </div>
         </MudPaper>
     }
-    else if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
-    {
-        <!-- SIDEBAR type - show indicator to open new sidebar -->
-        <MudPaper Class="sidebar-folder-indicator" Elevation="1">
-            <MudTooltip Text="@($"Open {Folder.Name} sidebar")" Placement="Placement.Right">
-                <MudButton OnClick="@HandleSidebarOpen" Class="pa-0 ma-0 sidebar-button">
-                    <div class="sidebar-icon-container">
-                        <MudIcon Icon="@Icons.Material.Filled.ArrowForwardIos"
-                                 Class="sidebar-arrow"
-                                 Size="Size.Small"/>
-                        <div Class="folder-grid-mini">
-                            @foreach (var app in Apps.Take(4))
-                            {
-                                <div class="app-icon-mini"
-                                     style="background-color: @app.Color;">
-                                    @if (!string.IsNullOrEmpty(app.Icon))
-                                    {
-                                        <span class="app-emoji-mini">@app.Icon</span>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </MudButton>
-            </MudTooltip>
-        </MudPaper>
-    }
 </div>
 
 @code {
     [Parameter] public WorkspaceFolder Folder { get; set; } = default!;
     [Parameter] public bool IsExpanded { get; set; }
     [Parameter] public EventCallback<WorkspaceFolder> OnFolderToggle { get; set; }
-    [Parameter] public EventCallback<AppInfo> OnAppClick { get; set; }
+    [Parameter] public EventCallback<Workspace> OnWorkspaceClick { get; set; }
     [Parameter] public EventCallback<WorkspaceFolder> OnSidebarOpen { get; set; }
 
     private bool isExpanded;
+    private IconInfo icon;
+    private ImmutableList<Workspace> Workspaces => Folder.Workspaces;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        // Only allow expansion for a DROPDOWN type
+        icon = Folder.GetIcon();
+
+        // Handle expansion based on the folder type
         if (Folder.Type != WorkspaceFolder.FolderType.DROPDOWN)
             isExpanded = IsExpanded;
     }
 
-    private ImmutableList<AppInfo> Apps => Folder.Apps;
-
     private async Task HandleToggle()
     {
-        if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
+        switch (Folder.Type)
         {
-            isExpanded = !isExpanded;
-            await OnFolderToggle.InvokeAsync(Folder);
-        }
-        else if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
-        {
-            await HandleSidebarOpen();
+            case WorkspaceFolder.FolderType.DROPDOWN:
+                isExpanded = !isExpanded;
+                break;
+
+            case WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE:
+                await OnFolderToggle.InvokeAsync(Folder);
+                break;
+
+            case WorkspaceFolder.FolderType.SIDEBAR:
+            default:
+                await HandleSidebarOpen();
+                break;
         }
     }
 
-    private async Task HandleAppClick(AppInfo app)
+    private async Task HandleWorkspaceClick(Workspace workspace)
     {
-        await OnAppClick.InvokeAsync(app);
+        await OnWorkspaceClick.InvokeAsync(workspace);
     }
 
     private async Task HandleSidebarOpen()
@@ -149,6 +151,13 @@
         border-radius: 16px;
     }
 
+    .folder-icon {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
     .folder-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -158,13 +167,27 @@
         height: 40px;
     }
 
-    .app-icon {
-        font-size: 10px;
+    .workspace-icon-mini {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        border-radius: 4px;
     }
 
-    .app-emoji {
-        font-size: 10px;
-        line-height: 1;
+    .workspace-placeholder {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .workspace-initial-mini {
+        color: white;
+        font-size: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
     }
 
     /* Expanded container styles */
@@ -198,7 +221,7 @@
         border-radius: 4px;
     }
 
-    .expanded-apps {
+    .expanded-workspaces {
         display: flex;
         flex-direction: column;
         gap: 4px;
@@ -208,7 +231,10 @@
         overflow-x: hidden;
     }
 
-    /* Workspace-like items in expanded dropdown */
+    .workspace-button {
+        width: 100%;
+    }
+
     .workspace-item-mini {
         width: 44px;
         height: 44px;
@@ -225,9 +251,10 @@
         transform: scale(1.05);
     }
 
-    .workspace-emoji-mini {
-        font-size: 20px;
-        line-height: 1;
+    .workspace-icon-expanded {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
     }
 
     .workspace-initial {
@@ -237,81 +264,17 @@
         text-transform: uppercase;
     }
 
-    /* Sidebar folder indicator styles */
-    .sidebar-folder-indicator {
-        width: 56px;
-        height: 56px;
-        background-color: #313338;
-        border-radius: 16px;
-        border: 2px solid #5865f2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-
-    .sidebar-folder-indicator:hover {
-        background-color: #3f4147;
-        border-color: #7983f5;
-    }
-
-    .sidebar-button {
-        width: 100%;
-        height: 100%;
-    }
-
-    .sidebar-icon-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .sidebar-arrow {
-        position: absolute;
-        right: 2px;
-        color: #5865f2;
-        animation: pulse 2s infinite;
-    }
-
-    .folder-grid-mini {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 1px;
-        width: 30px;
-        height: 30px;
-    }
-
-    .app-icon-mini {
-        border-radius: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .app-emoji-mini {
-        font-size: 8px;
-        line-height: 1;
-    }
-
-    /* Scrollbar for expanded apps */
-    .expanded-apps::-webkit-scrollbar {
+    /* Scrollbar for expanded workspaces */
+    .expanded-workspaces::-webkit-scrollbar {
         width: 2px;
     }
 
-    .expanded-apps::-webkit-scrollbar-track {
+    .expanded-workspaces::-webkit-scrollbar-track {
         background: transparent;
     }
 
-    .expanded-apps::-webkit-scrollbar-thumb {
+    .expanded-workspaces::-webkit-scrollbar-thumb {
         background: #1e1f22;
         border-radius: 1px;
-    }
-
-    .app-button {
-        width: 100%;
     }
 </style>

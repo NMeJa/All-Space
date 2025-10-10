@@ -5,6 +5,8 @@ namespace AllSpace.Data.Services;
 
 public static class MockDataGenerator
 {
+	private static readonly Random random = new();
+
 	// Predefined colors for consistency
 	private static class BrandColors
 	{
@@ -39,113 +41,178 @@ public static class MockDataGenerator
 		public const string Skype = "#00aff0";
 	}
 
+	private static readonly (string Name, string Url, string Color)[] ServiceTemplates =
+	{
+		("Gmail", "https://mail.google.com", BrandColors.Gmail),
+		("Slack", "https://slack.com", BrandColors.Slack),
+		("Discord", "https://discord.com", BrandColors.Discord),
+		("Teams", "https://teams.microsoft.com", BrandColors.Teams),
+		("Notion", "https://notion.so", BrandColors.Notion),
+		("Trello", "https://trello.com", BrandColors.Trello),
+		("GitHub", "https://github.com", BrandColors.GitHub),
+		("WhatsApp", "https://web.whatsapp.com", BrandColors.WhatsApp),
+		("Telegram", "https://web.telegram.org", BrandColors.Telegram),
+		("YouTube", "https://youtube.com", BrandColors.YouTube),
+		("Spotify", "https://open.spotify.com", BrandColors.Spotify),
+		("LinkedIn", "https://linkedin.com", BrandColors.LinkedIn),
+		("Twitter", "https://twitter.com", BrandColors.Twitter),
+		("Figma", "https://figma.com", BrandColors.Figma),
+		("Dropbox", "https://dropbox.com", BrandColors.Dropbox),
+		("Todoist", "https://todoist.com", BrandColors.Todoist),
+		("Asana", "https://asana.com", BrandColors.Asana),
+		("Jira", "https://jira.atlassian.com", BrandColors.Jira),
+		("Calendar", "https://calendar.google.com", BrandColors.Calendar),
+		("Drive", "https://drive.google.com", BrandColors.Drive),
+	};
+
+	// Generate random app
+	public static AppInfo GenerateRandomApp()
+	{
+		var template = ServiceTemplates[random.Next(ServiceTemplates.Length)];
+		var id = $"app-{Guid.NewGuid():N}";
+
+		return new AppInfo(
+						   id,
+						   $"{template.Name} {random.Next(1, 100)}",
+						   template.Url,
+						   template.Color
+						  );
+	}
+
+	// Generate multiple random apps
+	public static ImmutableList<AppInfo> GenerateRandomApps(int count)
+	{
+		return Enumerable.Range(0, count)
+						 .Select(_ => GenerateRandomApp())
+						 .ToImmutableList();
+	}
+
+	// Generate random workspace (with 1-3 apps)
+	public static Workspace GenerateRandomWorkspace()
+	{
+		var id = $"ws-{Guid.NewGuid():N}";
+		var appCount = random.Next(1, 4); // 1 to 3 apps
+		var apps = GenerateRandomApps(appCount);
+
+		// Single app workspace uses app name, multi-app gets custom name
+		var name = appCount == 1
+					   ? apps[0].Name
+					   : $"Workspace {random.Next(1, 1000)}";
+
+		return new Workspace(id, name, apps);
+	}
+
+	// Generate multiple random workspaces
+	public static List<Workspace> GenerateRandomWorkspaces(int count)
+	{
+		return Enumerable.Range(0, count)
+						 .Select(_ => GenerateRandomWorkspace())
+						 .ToList();
+	}
+
+	// Generate random folder with workspaces
+	public static WorkspaceFolder GenerateRandomFolder()
+	{
+		var id = $"folder-{Guid.NewGuid():N}";
+		var name = $"Folder {random.Next(1, 1000)}";
+		var type = (WorkspaceFolder.FolderType)random.Next(0, 3);
+		var workspaceCount = random.Next(2, 8); // 2 to 7 workspaces
+		var workspaces = GenerateRandomWorkspaces(workspaceCount);
+
+		return new WorkspaceFolder(id, name, type, workspaces.ToImmutableList());
+	}
+
+	// Generate multiple folders with a specific count
+	public static List<WorkspaceFolder> GenerateFolders(int count)
+	{
+		var folders = ImmutableList.CreateBuilder<WorkspaceFolder>();
+		var predefinedFolders = GetMockFolders();
+
+		for (int i = 0; i < count; i++)
+		{
+			if (i < predefinedFolders.Count)
+			{
+				folders.Add(predefinedFolders[i]);
+			}
+			else
+			{
+				folders.Add(GenerateRandomFolder());
+			}
+		}
+
+		return folders.ToList();
+	}
+
+	// Get predefined mock workspaces
+	public static List<Workspace> GetMockWorkspaces()
+	{
+		// Create individual apps
+		var gmailApp = new AppInfo("gmail", "Gmail", "https://mail.google.com", BrandColors.Gmail);
+		var slackApp = new AppInfo("slack", "Slack", "https://slack.com", BrandColors.Slack);
+		var notionApp = new AppInfo("notion", "Notion", "https://notion.so", BrandColors.Notion);
+		var githubApp = new AppInfo("github", "GitHub", "https://github.com", BrandColors.GitHub);
+		var discordApp = new AppInfo("discord", "Discord", "https://discord.com", BrandColors.Discord);
+
+		return new List<Workspace>
+		{
+			// Single app workspaces
+			Workspace.CreateSingle("ws-gmail", gmailApp),
+			Workspace.CreateSingle("ws-slack", slackApp),
+			Workspace.CreateSingle("ws-notion", notionApp),
+			Workspace.CreateSingle("ws-github", githubApp),
+			Workspace.CreateSingle("ws-discord", discordApp),
+
+			// Multi-app workspace (for side-by-side view)
+			Workspace.CreateMulti("ws-productivity", "Productivity Suite",
+								  null, null, notionApp, githubApp),
+
+			Workspace.CreateMulti("ws-communication", "Communication Hub",
+								  null, null, slackApp, discordApp)
+		};
+	}
+
+	// Get predefined mock folders
 	public static ImmutableList<WorkspaceFolder> GetMockFolders()
 	{
+		var workspaces = GetMockWorkspaces();
+
+		// Create Google folder with Google workspaces
+		var googleWorkspaces = new List<Workspace>
+		{
+			Workspace.CreateSingle("ws-gmail-1",
+								   new AppInfo("gmail-1", "Gmail Personal", "https://mail.google.com", BrandColors.Gmail)),
+			Workspace.CreateSingle("ws-gmail-2",
+								   new AppInfo("gmail-2", "Gmail Work", "https://mail.google.com/mail/u/1", BrandColors.Gmail)),
+			Workspace.CreateSingle("ws-calendar",
+								   new AppInfo("calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar)),
+			Workspace.CreateSingle("ws-drive",
+								   new AppInfo("drive", "Drive", "https://drive.google.com", BrandColors.Drive))
+		};
+
+		// Create Communication folder
+		var commWorkspaces = workspaces.Where(w =>
+												  w.Name.Contains("Slack") || w.Name.Contains("Discord") ||
+												  w.Name.Contains("Communication")).ToList();
+
+		// Create Productivity folder
+		var prodWorkspaces = workspaces.Where(w =>
+												  w.Name.Contains("Notion") || w.Name.Contains("GitHub") ||
+												  w.Name.Contains("Productivity")).ToList();
+
 		return ImmutableList.Create(
-									CreateProductivityFolder(),
-									CreateGoogleFolder(),
-									CreateMicrosoftFolder(),
-									CreateCommunicationFolder(),
-									CreateDevelopmentFolder(),
-									CreateSocialFolder(),
-									CreateDesignFolder()
+									WorkspaceFolder.Create("folder-google", "Google",
+														   WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE,
+														   null, null, googleWorkspaces.ToArray()),
+									WorkspaceFolder.Create("folder-communication", "Communication",
+														   WorkspaceFolder.FolderType.DROPDOWN,
+														   null, null, commWorkspaces.ToArray()),
+									WorkspaceFolder.Create("folder-productivity", "Productivity",
+														   WorkspaceFolder.FolderType.SIDEBAR,
+														   null, null, prodWorkspaces.ToArray())
 								   );
 	}
 
-	public static ImmutableList<Workspace> GetMockWorkspaces()
-	{
-		return ImmutableList.Create(
-									new Workspace(
-												  id: "ws-gmail-personal",
-												  name: "Gmail Personal",
-												  url: "https://mail.google.com",
-												  backgroundColor: BrandColors.Gmail,
-												  icon: "📧",
-												  profileId: "google-personal"
-												 ),
-									new Workspace(
-												  id: "ws-gmail-work",
-												  name: "Gmail Work",
-												  url: "https://mail.google.com/mail/u/1",
-												  backgroundColor: BrandColors.Gmail,
-												  icon: "💼",
-												  profileId: "google-work"
-												 ),
-									new Workspace(
-												  id: "ws-slack-team",
-												  name: "Slack Team",
-												  url: "https://app.slack.com",
-												  backgroundColor: BrandColors.Slack,
-												  icon: "💬",
-												  profileId: "slack-team"
-												 ),
-									new Workspace(
-												  id: "ws-notion",
-												  name: "Notion",
-												  url: "https://notion.so",
-												  backgroundColor: BrandColors.Notion,
-												  icon: "📝"
-												 ),
-									new Workspace(
-												  id: "ws-discord",
-												  name: "Discord",
-												  url: "https://discord.com/app",
-												  backgroundColor: BrandColors.Discord,
-												  icon: "🎮"
-												 ),
-									new Workspace(
-												  id: "ws-whatsapp",
-												  name: "WhatsApp",
-												  url: "https://web.whatsapp.com",
-												  backgroundColor: BrandColors.WhatsApp,
-												  icon: "💚"
-												 ),
-									new Workspace(
-												  id: "ws-github",
-												  name: "GitHub",
-												  url: "https://github.com",
-												  backgroundColor: BrandColors.GitHub,
-												  icon: "🐙",
-												  profileId: "github-main"
-												 ),
-									new Workspace(
-												  id: "ws-youtube",
-												  name: "YouTube",
-												  url: "https://youtube.com",
-												  backgroundColor: BrandColors.YouTube,
-												  icon: "📺",
-												  profileId: "google-personal"
-												 )
-								   );
-	}
-
-	public static ImmutableList<WorkspaceGroup> GetMockGroups()
-	{
-		return ImmutableList.Create(
-									new WorkspaceGroup(
-													   Id: "group-work",
-													   Name: "Work",
-													   Color: "#6366f1",
-													   WorkspaceIds: ImmutableHashSet.Create("ws-gmail-work", "ws-slack-team", "ws-notion"),
-													   Order: 1
-													  ),
-									new WorkspaceGroup(
-													   Id: "group-personal",
-													   Name: "Personal",
-													   Color: "#8b5cf6",
-													   WorkspaceIds: ImmutableHashSet.Create("ws-gmail-personal", "ws-discord", "ws-youtube"),
-													   Order: 2
-													  ),
-									new WorkspaceGroup(
-													   Id: "group-communication",
-													   Name: "Communication",
-													   Color: "#10b981",
-													   WorkspaceIds: ImmutableHashSet.Create("ws-whatsapp", "ws-discord", "ws-slack-team"),
-													   Order: 3
-													  )
-								   );
-	}
-
+	// Get mock auth profiles
 	public static ImmutableDictionary<string, AuthProfile> GetMockAuthProfiles()
 	{
 		var profiles = new[]
@@ -161,16 +228,6 @@ public static class MockDataGenerator
 							   }
 							  ),
 			AuthProfile.Create(
-							   "google-work",
-							   "Work Google",
-							   AuthProfile.Providers.Google,
-							   new Dictionary<string, string>
-							   {
-								   ["email"] = "work@company.com",
-								   ["token"] = "encrypted_token_work"
-							   }
-							  ),
-			AuthProfile.Create(
 							   "microsoft-main",
 							   "Microsoft Account",
 							   AuthProfile.Providers.Microsoft,
@@ -179,131 +236,10 @@ public static class MockDataGenerator
 								   ["email"] = "user@outlook.com",
 								   ["token"] = "encrypted_token_ms"
 							   }
-							  ),
-			AuthProfile.Create(
-							   "slack-team",
-							   "Team Slack",
-							   AuthProfile.Providers.Slack,
-							   new Dictionary<string, string>
-							   {
-								   ["workspace"] = "team-workspace",
-								   ["token"] = "encrypted_token_slack"
-							   }
-							  ),
-			AuthProfile.Create(
-							   "github-main",
-							   "GitHub Account",
-							   AuthProfile.Providers.Custom,
-							   new Dictionary<string, string>
-							   {
-								   ["username"] = "developer",
-								   ["token"] = "encrypted_token_github"
-							   }
 							  )
 		};
 
 		return profiles.ToImmutableDictionary(p => p.Id);
-	}
-
-	private static WorkspaceFolder CreateProductivityFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-productivity",
-									  "Productivity",
-									  WorkspaceFolder.FolderType.DROPDOWN,
-									  new AppInfo("app-notion", "Notion", "https://notion.so", BrandColors.Notion, "📝"),
-									  new AppInfo("app-todoist", "Todoist", "https://todoist.com", BrandColors.Todoist, "✅"),
-									  new AppInfo("app-trello", "Trello", "https://trello.com", BrandColors.Trello, "📋"),
-									  new AppInfo("app-asana", "Asana", "https://asana.com", BrandColors.Asana, "🎯")
-									 );
-	}
-
-	private static WorkspaceFolder CreateGoogleFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-google",
-									  "Google Workspace",
-									  WorkspaceFolder.FolderType.SIDEBAR,
-									  new AppInfo.Authenticated("app-gmail", "Gmail", "https://mail.google.com", BrandColors.Gmail, "google-personal",
-																"📧"),
-									  new AppInfo.Authenticated("app-calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar,
-																"google-personal", "📅"),
-									  new AppInfo.Authenticated("app-drive", "Drive", "https://drive.google.com", BrandColors.Drive,
-																"google-personal", "☁️"),
-									  new AppInfo.Authenticated("app-meet", "Meet", "https://meet.google.com", BrandColors.Meet, "google-personal",
-																"📹")
-									 );
-	}
-
-	private static WorkspaceFolder CreateMicrosoftFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-microsoft",
-									  "Microsoft 365",
-									  WorkspaceFolder.FolderType.SIDEBAR,
-									  new AppInfo.Authenticated("app-outlook", "Outlook", "https://outlook.live.com", BrandColors.Outlook,
-																"microsoft-main", "📮"),
-									  new AppInfo.Authenticated("app-teams", "Teams", "https://teams.microsoft.com", BrandColors.Teams,
-																"microsoft-main", "👥"),
-									  new AppInfo.Authenticated("app-onedrive", "OneDrive", "https://onedrive.live.com", BrandColors.OneDrive,
-																"microsoft-main", "💾"),
-									  new AppInfo.Authenticated("app-onenote", "OneNote", "https://onenote.com", BrandColors.Outlook,
-																"microsoft-main", "📓")
-									 );
-	}
-
-	private static WorkspaceFolder CreateCommunicationFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-communication",
-									  "Communication",
-									  WorkspaceFolder.FolderType.DROPDOWN,
-									  new AppInfo.Authenticated("app-slack", "Slack", "https://slack.com", BrandColors.Slack, "slack-team", "💬"),
-									  new AppInfo("app-discord", "Discord", "https://discord.com", BrandColors.Discord, "🎮"),
-									  new AppInfo("app-whatsapp", "WhatsApp", "https://web.whatsapp.com", BrandColors.WhatsApp, "💚"),
-									  new AppInfo("app-telegram", "Telegram", "https://web.telegram.org", BrandColors.Telegram, "✈️")
-									 );
-	}
-
-	private static WorkspaceFolder CreateDevelopmentFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-development",
-									  "Development",
-									  WorkspaceFolder.FolderType.DROPDOWN,
-									  new AppInfo.Authenticated("app-github", "GitHub", "https://github.com", BrandColors.GitHub, "github-main",
-																"🐙"),
-									  new AppInfo("app-jira", "Jira", "https://jira.atlassian.com", BrandColors.Jira, "🔧"),
-									  new AppInfo("app-figma", "Figma", "https://figma.com", BrandColors.Figma, "🎨"),
-									  new AppInfo("app-miro", "Miro", "https://miro.com", BrandColors.Miro, "🎯")
-									 );
-	}
-
-	private static WorkspaceFolder CreateSocialFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-social",
-									  "Social Media",
-									  WorkspaceFolder.FolderType.SIDEBAR,
-									  new AppInfo("app-twitter", "Twitter", "https://twitter.com", BrandColors.Twitter, "🐦"),
-									  new AppInfo("app-linkedin", "LinkedIn", "https://linkedin.com", BrandColors.LinkedIn, "💼"),
-									  new AppInfo("app-facebook", "Facebook", "https://facebook.com", BrandColors.Facebook, "👤"),
-									  new AppInfo("app-instagram", "Instagram", "https://instagram.com", BrandColors.Instagram, "📷")
-									 );
-	}
-
-	private static WorkspaceFolder CreateDesignFolder()
-	{
-		return WorkspaceFolder.Create(
-									  "folder-design",
-									  "Design & Media",
-									  WorkspaceFolder.FolderType.DROPDOWN,
-									  new AppInfo("app-figma2", "Figma", "https://figma.com", BrandColors.Figma, "🎨"),
-									  new AppInfo("app-spotify", "Spotify", "https://open.spotify.com", BrandColors.Spotify, "🎵"),
-									  new AppInfo.Authenticated("app-youtube", "YouTube", "https://youtube.com", BrandColors.YouTube,
-																"google-personal", "📺"),
-									  new AppInfo("app-dropbox", "Dropbox", "https://dropbox.com", BrandColors.Dropbox, "📦")
-									 );
 	}
 
 	// Generate complete app state
@@ -311,90 +247,17 @@ public static class MockDataGenerator
 	{
 		return new AppCollectionState(
 									  Folders: GetMockFolders(),
-									  Workspaces: GetMockWorkspaces(),
-									  Groups: GetMockGroups(),
+									  Workspaces: GetMockWorkspaces().ToImmutableList(),
 									  Profiles: GetMockAuthProfiles()
 									 );
 	}
 
-	// Generate sample notification settings
-	public static ImmutableList<NotificationSettings> GetMockNotificationSettings()
+	// Generate app state with specific counts
+	public static AppCollectionState GenerateAppState(int folderCount, int workspaceCount)
 	{
-		var workspaces = GetMockWorkspaces();
-		return workspaces.Select(ws => new NotificationSettings(
-																WorkspaceId: ws.Id,
-																Enabled: ws.Id.Contains("gmail") || ws.Id.Contains("slack"),
-																PlaySound: ws.Id.Contains("slack"),
-																CustomSound: ws.Id.Contains("slack") ? "slack-notification.mp3" : null,
-																ShowBadge: true,
-																ShowDesktopNotification: true
-															   )).ToImmutableList();
-	}
-
-	// Generate random workspace for testing
-	public static Workspace GenerateRandomWorkspace()
-	{
-		var random = new Random();
-		var names = new[] { "Gmail", "Slack", "Discord", "Teams", "Notion", "Trello" };
-		var colors = new[] { BrandColors.Gmail, BrandColors.Slack, BrandColors.Discord, BrandColors.Teams, BrandColors.Notion, BrandColors.Trello };
-		var icons = new[] { "📧", "💬", "🎮", "👥", "📝", "📋" };
-
-		var index = random.Next(names.Length);
-		return new Workspace(
-							 id: $"ws-{Guid.NewGuid():N}",
-							 name: $"{names[index]} {random.Next(1, 100)}",
-							 url: "https://example.com",
-							 backgroundColor: colors[index],
-							 icon: icons[index]
-							);
-	}
-
-	// Generate test data with specific counts
-	public static ImmutableList<WorkspaceFolder> GenerateFolders(int count)
-	{
-		var folders = ImmutableList.CreateBuilder<WorkspaceFolder>();
-		var allFolders = GetMockFolders();
-
-		for (int i = 0; i < count; i++)
-		{
-			if (i < allFolders.Count)
-			{
-				folders.Add(allFolders[i]);
-			}
-			else
-			{
-				// Generate additional random folders if needed
-				folders.Add(WorkspaceFolder.Create(
-												   $"folder-{Guid.NewGuid():N}",
-												   $"Folder {i + 1}",
-												   i % 2 == 0 ? WorkspaceFolder.FolderType.DROPDOWN : WorkspaceFolder.FolderType.SIDEBAR,
-												   GenerateRandomApps(7).ToArray()
-												  ));
-			}
-		}
-
-		return folders.ToImmutable();
-	}
-
-	private static ImmutableList<AppInfo> GenerateRandomApps(int count)
-	{
-		var apps = ImmutableList.CreateBuilder<AppInfo>();
-		var names = new[] { "App", "Tool", "Service", "Platform", "Suite" };
-		var colors = new[] { "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7", "#dfe6e9" };
-		var icons = new[] { "🚀", "⚡", "🔥", "💎", "🌟", "✨" };
-
-		var random = new Random();
-		for (int i = 0; i < count; i++)
-		{
-			apps.Add(new AppInfo(
-								 $"app-{Guid.NewGuid():N}",
-								 $"{names[random.Next(names.Length)]} {i + 1}",
-								 "https://example.com",
-								 colors[random.Next(colors.Length)],
-								 icons[random.Next(icons.Length)]
-								));
-		}
-
-		return apps.ToImmutable();
+		return new AppCollectionState(Folders: GenerateFolders(folderCount).ToImmutableList(),
+									  Workspaces: GenerateRandomWorkspaces(workspaceCount).ToImmutableList(),
+									  Profiles: GetMockAuthProfiles()
+									 );
 	}
 }

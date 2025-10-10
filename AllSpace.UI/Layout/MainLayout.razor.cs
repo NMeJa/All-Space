@@ -7,8 +7,8 @@ namespace AllSpace.UI.Layout;
 
 public partial class MainLayout : LayoutComponentBase
 {
-	private ImmutableList<WorkspaceFolder> Folders = ImmutableList<WorkspaceFolder>.Empty;
-	private ImmutableList<Workspace> Workspaces = ImmutableList<Workspace>.Empty;
+	private List<WorkspaceFolder> Folders = new();
+	private List<Workspace> Workspaces = new();
 	private string ActiveWorkspaceId = "1";
 	private Workspace ActiveWorkspace = null;
 
@@ -16,7 +16,7 @@ public partial class MainLayout : LayoutComponentBase
 	{
 		base.OnInitialized();
 		Folders = MockDataGenerator.GenerateFolders(10);
-		Workspaces = MockDataGenerator.GetMockWorkspaces();
+		Workspaces = MockDataGenerator.GenerateRandomWorkspaces(5);
 	}
 
 	private void HandleWorkspaceClick(Workspace workspace)

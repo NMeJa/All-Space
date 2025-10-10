@@ -5,9 +5,28 @@ public record AppInfo(
 	string Name,
 	string Url,
 	string Color,
-	string? Icon = null,
+	string? CustomIconPath = null,
+	string? FaviconPath = null,
+	string? DefaultIconPath = null,
 	string? Category = null)
 {
+	// Get the best available icon with priority
+	public IconInfo GetIcon()
+	{
+		if (!string.IsNullOrEmpty(CustomIconPath) && File.Exists(CustomIconPath))
+			return new IconInfo(CustomIconPath, IconType.Custom);
+
+		if (!string.IsNullOrEmpty(FaviconPath) && File.Exists(FaviconPath))
+			return new IconInfo(FaviconPath, IconType.Favicon);
+
+		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
+			return new IconInfo(DefaultIconPath, IconType.Default);
+
+		//TODO Return Default Icon Question mark
+		return default;
+	}
+
+
 	// For apps that need authentication
 	public record Authenticated(
 		string Id,
@@ -15,10 +34,13 @@ public record AppInfo(
 		string Url,
 		string Color,
 		string ProfileId,
-		string? Icon = null,
+		string? CustomIconPath = null,
+		string? FaviconPath = null,
+		string? DefaultIconPath = null,
 		string? Category = null
-		) : AppInfo(Id, Name, Url, Color, Icon, Category);
+		) : AppInfo(Id, Name, Url, Color, CustomIconPath, FaviconPath, DefaultIconPath, Category);
 }
+
 
 /*
  *  var gmailApp = new AppInfo(

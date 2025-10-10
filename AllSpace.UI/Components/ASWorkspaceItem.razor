@@ -1,0 +1,51 @@
+﻿@inject Data.Services.IIconService IconService
+
+<MudContainer Class="ma-0 flex-shrink-0" Fixed="true" Gutters="false">
+    <MudButton OnClick="@HandleClick" Class="pa-0">
+        <MudPaper Class="@GetWorkspaceClass()" Elevation="0" Width="55" Height="55"
+                  Style="@($"background-color: {Workspace.BackgroundColor}")">
+            <MudIcon Icon="@($"file:///{icon.Path.Replace('\\', '/')}")"
+                     Class="workspace-icon"
+                     Title="@Workspace.Name"/>
+        </MudPaper>
+    </MudButton>
+</MudContainer>
+
+@code {
+    [Parameter] public Workspace Workspace { get; set; } = default!;
+    [Parameter] public bool IsActive { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private IconInfo icon;
+
+    protected override void OnParametersSet()
+    {
+        icon = Workspace.GetIcon();
+    }
+
+    private string GetWorkspaceClass()
+    {
+        return "workspace-item" + (IsActive ? " active" : string.Empty);
+    }
+
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync();
+    }
+
+}
+
+<style>
+    .workspace-icon {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
+
+    .workspace-icon.default-icon {
+        opacity: 0.8; /* Slightly dimmed to indicate it's a default icon */
+    }
+
+    /* ... rest of styles ... */
+</style>
