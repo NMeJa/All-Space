@@ -2,7 +2,7 @@
 <MudLayout>
     <div class="app-container">
         <ASSidebar Folders="@Folders"
-                   Workspaces="@Workspaces"
+                   Workspaces="@Workspaces.ToList()"
                    ActiveWorkspaceId="@ActiveWorkspaceId"
                    OnWorkspaceClick="HandleWorkspaceClick"
                    OnFolderClick="HandleFolderClick"/>

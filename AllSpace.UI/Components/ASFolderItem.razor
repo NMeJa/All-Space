@@ -1,37 +1,109 @@
-﻿<MudPaper Class="folder-item" Elevation="0" @onclick="OnClick">
-    <div class="folder-grid">
-        @foreach (var app in Apps.Take(4))
-        {
-            <div class="app-icon" style="background-color: @app.Color;">
-                @if (!string.IsNullOrEmpty(app.Icon))
+﻿<div class="folder-wrapper flex-shrink-0">
+    @if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
+    {
+        <div>asdasdasd</div>
+    }
+    @if (!isExpanded)
+    {
+        <!-- Collapsed folder view -->
+        <MudContainer Class="ma-0" Fixed="true" Gutters="false">
+            <MudButton OnClick="@HandleToggle" Class="pa-0 ma-0">
+                <MudPaper Class="pa-2 folder-item" Elevation="0"
+                          Width="55" Height="55">
+                    <div Class="folder-grid">
+                        @foreach (var app in Apps.Take(4))
+                        {
+                            <div class="app-icon font-monospace d-flex rounded-circle align-items-center justify-content-center"
+                                 style="background-color: @app.Color;">
+                                @if (!string.IsNullOrEmpty(app.Icon))
+                                {
+                                    <span class="app-emoji">@app.Icon</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </MudPaper>
+            </MudButton>
+        </MudContainer>
+    }
+    else
+    {
+        <!-- Expanded folder view with container -->
+        <MudPaper Class="expanded-container" Elevation="2">
+            <!-- Header with close button -->
+            <div class="expanded-header">
+                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                               Size="Size.Small"
+                               Class="close-button"
+                               OnClick="@HandleToggle"/>
+            </div>
+
+            <!-- Apps in the folder -->
+            <div class="expanded-apps">
+                @foreach (var app in Apps)
                 {
-                    <MudIcon Icon="@app.Icon" Size="Size.Small" Style="color: white;"/>
+                    <MudTooltip Text="@app.Name" Placement="Placement.Right" Arrow="true">
+                        <MudButton OnClick="@(() => HandleAppClick(app))"
+                                   Class="pa-0 ma-0 app-button">
+                            <div class="expanded-app-icon"
+                                 style="background-color: @app.Color;">
+                                @if (!string.IsNullOrEmpty(app.Icon))
+                                {
+                                    <span class="app-emoji-large">@app.Icon</span>
+                                }
+                                else
+                                {
+                                    <span class="app-initial">@app.Name[0]</span>
+                                }
+                            </div>
+                        </MudButton>
+                    </MudTooltip>
                 }
             </div>
-        }
-        @for (int i = Apps.Count; i < 4; i++)
-        {
-            <div class="app-icon empty"></div>
-        }
-    </div>
-</MudPaper>
+        </MudPaper>
+    }
+</div>
 
 @code {
     [Parameter] public WorkspaceFolder Folder { get; set; } = default!;
-    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public bool IsExpanded { get; set; }
+    [Parameter] public EventCallback<WorkspaceFolder> OnFolderToggle { get; set; }
+    [Parameter] public EventCallback<AppInfo> OnAppClick { get; set; }
+
+    private bool isExpanded;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
+            isExpanded = IsExpanded;
+    }
 
     private ImmutableList<AppInfo> Apps => Folder.Apps;
+
+    private async Task HandleToggle()
+    {
+        isExpanded = !isExpanded;
+        await OnFolderToggle.InvokeAsync(Folder);
+    }
+
+    private async Task HandleAppClick(AppInfo app)
+    {
+        await OnAppClick.InvokeAsync(app);
+    }
+
 }
 
 <style>
-    .folder-item {
+    .folder-wrapper {
         width: 56px;
-        height: 56px;
+    }
+
+    .folder-item {
         border-radius: 50%;
         background-color: #5865f2;
-        cursor: pointer;
         transition: border-radius 0.2s;
-        padding: 8px;
+        cursor: pointer;
     }
 
     .folder-item:hover {
@@ -43,19 +115,104 @@
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr 1fr;
         gap: 2px;
-        width: 100%;
-        height: 100%;
+        width: 40px;
+        height: 40px;
     }
 
     .app-icon {
+        font-size: 10px;
+    }
+
+    .app-emoji {
+        font-size: 10px;
+        line-height: 1;
+    }
+
+    /* Expanded container styles */
+    .expanded-container {
+        background-color: #313338;
+        border-radius: 8px;
+        padding: 4px;
+        width: 56px;
+        border: 1px solid #1e1f22;
+        animation: expandIn 0.2s ease-out;
+    }
+
+
+    .expanded-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 2px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #1e1f22;
+    }
+
+    .close-button {
+        color: #b5bac1;
+        padding: 0;
+        width: 18px;
+        height: 18px;
+    }
+
+    .close-button:hover {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
+    }
+
+    .expanded-apps {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 2px;
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Scrollbar for expanded apps */
+    .expanded-apps::-webkit-scrollbar {
+        width: 2px;
+    }
+
+    .expanded-apps::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .expanded-apps::-webkit-scrollbar-thumb {
+        background: #1e1f22;
+        border-radius: 1px;
+    }
+
+    .app-button {
+        width: 100%;
+    }
+
+    .expanded-app-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
     }
 
-    .app-icon.empty {
-        background-color: rgba(255, 255, 255, 0.2);
+    .expanded-app-icon:hover {
+        border-radius: 12px;
+        transform: scale(1.05);
     }
 
+    .app-emoji-large {
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    .app-initial {
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
 </style>

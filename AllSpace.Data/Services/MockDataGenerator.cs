@@ -210,6 +210,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-productivity",
 									  "Productivity",
+									  WorkspaceFolder.FolderType.DROPDOWN,
 									  new AppInfo("app-notion", "Notion", "https://notion.so", BrandColors.Notion, "📝"),
 									  new AppInfo("app-todoist", "Todoist", "https://todoist.com", BrandColors.Todoist, "✅"),
 									  new AppInfo("app-trello", "Trello", "https://trello.com", BrandColors.Trello, "📋"),
@@ -222,6 +223,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-google",
 									  "Google Workspace",
+									  WorkspaceFolder.FolderType.SIDEBAR,
 									  new AppInfo.Authenticated("app-gmail", "Gmail", "https://mail.google.com", BrandColors.Gmail, "google-personal",
 																"📧"),
 									  new AppInfo.Authenticated("app-calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar,
@@ -238,6 +240,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-microsoft",
 									  "Microsoft 365",
+									  WorkspaceFolder.FolderType.SIDEBAR,
 									  new AppInfo.Authenticated("app-outlook", "Outlook", "https://outlook.live.com", BrandColors.Outlook,
 																"microsoft-main", "📮"),
 									  new AppInfo.Authenticated("app-teams", "Teams", "https://teams.microsoft.com", BrandColors.Teams,
@@ -254,6 +257,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-communication",
 									  "Communication",
+									  WorkspaceFolder.FolderType.DROPDOWN,
 									  new AppInfo.Authenticated("app-slack", "Slack", "https://slack.com", BrandColors.Slack, "slack-team", "💬"),
 									  new AppInfo("app-discord", "Discord", "https://discord.com", BrandColors.Discord, "🎮"),
 									  new AppInfo("app-whatsapp", "WhatsApp", "https://web.whatsapp.com", BrandColors.WhatsApp, "💚"),
@@ -266,6 +270,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-development",
 									  "Development",
+									  WorkspaceFolder.FolderType.DROPDOWN,
 									  new AppInfo.Authenticated("app-github", "GitHub", "https://github.com", BrandColors.GitHub, "github-main",
 																"🐙"),
 									  new AppInfo("app-jira", "Jira", "https://jira.atlassian.com", BrandColors.Jira, "🔧"),
@@ -279,6 +284,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-social",
 									  "Social Media",
+									  WorkspaceFolder.FolderType.SIDEBAR,
 									  new AppInfo("app-twitter", "Twitter", "https://twitter.com", BrandColors.Twitter, "🐦"),
 									  new AppInfo("app-linkedin", "LinkedIn", "https://linkedin.com", BrandColors.LinkedIn, "💼"),
 									  new AppInfo("app-facebook", "Facebook", "https://facebook.com", BrandColors.Facebook, "👤"),
@@ -291,6 +297,7 @@ public static class MockDataGenerator
 		return WorkspaceFolder.Create(
 									  "folder-design",
 									  "Design & Media",
+									  WorkspaceFolder.FolderType.DROPDOWN,
 									  new AppInfo("app-figma2", "Figma", "https://figma.com", BrandColors.Figma, "🎨"),
 									  new AppInfo("app-spotify", "Spotify", "https://open.spotify.com", BrandColors.Spotify, "🎵"),
 									  new AppInfo.Authenticated("app-youtube", "YouTube", "https://youtube.com", BrandColors.YouTube,
@@ -360,7 +367,8 @@ public static class MockDataGenerator
 				folders.Add(WorkspaceFolder.Create(
 												   $"folder-{Guid.NewGuid():N}",
 												   $"Folder {i + 1}",
-												   GenerateRandomApps(4).ToArray()
+												   i % 2 == 0 ? WorkspaceFolder.FolderType.DROPDOWN : WorkspaceFolder.FolderType.SIDEBAR,
+												   GenerateRandomApps(7).ToArray()
 												  ));
 			}
 		}

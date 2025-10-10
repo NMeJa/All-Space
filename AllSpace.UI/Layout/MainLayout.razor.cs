@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using AllSpace.Data.Services;
 using AllSpace.Domain.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -14,16 +15,8 @@ public partial class MainLayout : LayoutComponentBase
 	protected override void OnInitialized()
 	{
 		base.OnInitialized();
-		var list = new List<WorkspaceFolder>
-		{
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-			WorkspaceFolder.Create("1", "test", new AppInfo("1", "test", "test", "test")),
-		};
-		Folders
+		Folders = MockDataGenerator.GenerateFolders(10);
+		Workspaces = MockDataGenerator.GetMockWorkspaces();
 	}
 
 	private void HandleWorkspaceClick(WorkspaceInfo workspace)

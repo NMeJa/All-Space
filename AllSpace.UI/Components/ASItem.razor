@@ -1,23 +1,21 @@
-﻿<div class="item-container">
-    @if (IsActive)
-    {
-        <div class="active-indicator"></div>
-    }
-    <MudPaper Class="@GetWorkspaceClass()" Elevation="0" @onclick="OnClick">
-        @if (!string.IsNullOrEmpty(Workspace.ImageUrl))
-        {
-            <MudAvatar Image="@Workspace.ImageUrl" Size="Size.Large"/>
-        }
-        else if (!string.IsNullOrEmpty(Workspace.Icon))
-        {
-            <MudIcon Icon="@Workspace.Icon" Style="color: white; font-size: 24px;"/>
-        }
-        else
-        {
-            <MudText Typo="Typo.h6" Style="color: white;">@Workspace.Name.Substring(0, 1)</MudText>
-        }
-    </MudPaper>
-</div>
+﻿<MudContainer Class="ma-0 flex-shrink-0" Fixed="true" Gutters="false">
+    <MudButton OnClick="@HandleClick" Class="pa-0">
+        <MudPaper Class="@GetWorkspaceClass()" Elevation="0" Width="55" Height="55">
+            @if (!string.IsNullOrEmpty(Workspace.ImageUrl))
+            {
+                <MudAvatar Image="@Workspace.ImageUrl" Size="Size.Large" Class="workspace-avatar"/>
+            }
+            else if (!string.IsNullOrEmpty(Workspace.Icon))
+            {
+                <span class="workspace-emoji">@Workspace.Icon</span>
+            }
+            else
+            {
+                <MudText Typo="Typo.h6" Style="color: white;">@Workspace.Name.Substring(0, 1)</MudText>
+            }
+        </MudPaper>
+    </MudButton>
+</MudContainer>
 
 @code {
     [Parameter] public WorkspaceInfo Workspace { get; set; } = default!;
@@ -26,46 +24,47 @@
 
     private string GetWorkspaceClass()
     {
-        return IsActive ? "workspace-item active" : "workspace-item";
+        return "workspace-item" + (IsActive ? " active" : string.Empty);
+    }
+
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync();
     }
 
 }
 
+<!--suppress CssUnusedSymbol -->
 <style>
-    .item-container {
-        position: relative;
-        width: 56px;
-        height: 56px;
-    }
 
-    .active-indicator {
-        position: absolute;
-        left: -12px;
-        top: 8px;
-        width: 4px;
-        height: 40px;
-        background-color: white;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .item {
-        width: 56px;
-        height: 56px;
+    .workspace-item {
+        width: 55px;
+        height: 55px;
         border-radius: 50%;
-        background-color: #ea4335;
         cursor: pointer;
         transition: border-radius 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
+        /*background-color: v-bind('Workspace.BackgroundColor');*/
     }
 
-    .item:hover {
+    .workspace-item:hover {
         border-radius: 16px;
     }
 
-    .item.active {
+    .workspace-item.active {
         border-radius: 16px;
+        background-color: #007bff;
     }
 
+    .workspace-avatar {
+        width: 55px;
+        height: 55px;
+    }
+
+    .workspace-emoji {
+        font-size: 40px;
+        line-height: 1;
+    }
 </style>

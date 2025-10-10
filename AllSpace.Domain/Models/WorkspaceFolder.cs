@@ -5,13 +5,14 @@ namespace AllSpace.Domain.Models;
 public record WorkspaceFolder(
 	string Id,
 	string Name,
+	WorkspaceFolder.FolderType Type,
 	ImmutableList<AppInfo> Apps)
 {
-	public static WorkspaceFolder Create(string id, string name, params AppInfo[] apps)
-		=> new(id, name, apps?.ToImmutableList() ?? ImmutableList<AppInfo>.Empty);
+	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN, params AppInfo[] apps)
+		=> new(id, name, type, apps?.ToImmutableList() ?? ImmutableList<AppInfo>.Empty);
 
-	public static WorkspaceFolder Empty(string id, string name)
-		=> new(id, name, ImmutableList<AppInfo>.Empty);
+	public static WorkspaceFolder Empty(string id, string name, FolderType type = FolderType.DROPDOWN)
+		=> new(id, name, type, ImmutableList<AppInfo>.Empty);
 
 	public WorkspaceFolder AddApp(AppInfo app)
 		=> this with { Apps = Apps.Add(app) };
@@ -25,6 +26,12 @@ public record WorkspaceFolder(
 		return index >= 0
 				   ? this with { Apps = Apps.SetItem(index, updater(Apps[index])) }
 				   : this;
+	}
+
+	public enum FolderType
+	{
+		DROPDOWN,
+		SIDEBAR
 	}
 }
 
