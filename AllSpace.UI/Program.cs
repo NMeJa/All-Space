@@ -1,3 +1,6 @@
+using AllSpace.Core;
+using AllSpace.Data;
+using AllSpace.Security;
 using AllSpace.UI;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
@@ -15,6 +18,11 @@ internal class Program
 		// Add services
 		builder.Services.AddLogging();
 		builder.Services.AddMudServices();
+
+		//Services from Other connected projects
+		builder.Services.AddData();
+		builder.Services.AddCore();
+		builder.Services.AddSecurity();
 
 		// Register root component
 		builder.RootComponents.Add<App>("#app");

@@ -1,5 +1,17 @@
 ﻿@inject Data.Services.IIconService IconService
-
+@switch (Folder.Type)
+{
+    case WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE:
+        <div>COL</div>
+        break;
+    case WorkspaceFolder.FolderType.DROPDOWN:
+        <div>DRO</div>
+        break;
+    case WorkspaceFolder.FolderType.SIDEBAR:
+    default:
+        <div>SID</div>
+        break;
+}
 <div class="folder-wrapper flex-shrink-0">
     @if (!isExpanded || Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
     {
@@ -116,15 +128,18 @@
         {
             case WorkspaceFolder.FolderType.DROPDOWN:
                 isExpanded = !isExpanded;
+                await OnFolderToggle.InvokeAsync(Folder);
                 break;
 
             case WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE:
-                await OnFolderToggle.InvokeAsync(Folder);
+                isExpanded = !isExpanded;
+                if (isExpanded) await OnFolderToggle.InvokeAsync(Folder); //don't notify on close
                 break;
 
             case WorkspaceFolder.FolderType.SIDEBAR:
             default:
                 await HandleSidebarOpen();
+                await OnFolderToggle.InvokeAsync(Folder);
                 break;
         }
     }

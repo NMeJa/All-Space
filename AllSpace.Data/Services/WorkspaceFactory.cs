@@ -40,6 +40,7 @@ public class WorkspaceFactory(IIconService iconService)
 
 		return new WorkspaceFolder(id, name, type,
 								   workspaces.ToImmutableList(),
+								   ImmutableList<WorkspaceFolder>.Empty,
 								   defaultIconPath: defaultIconPath);
 	}
 }

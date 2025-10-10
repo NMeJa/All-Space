@@ -119,7 +119,7 @@ public static class MockDataGenerator
 		var workspaceCount = random.Next(2, 8); // 2 to 7 workspaces
 		var workspaces = GenerateRandomWorkspaces(workspaceCount);
 
-		return new WorkspaceFolder(id, name, type, workspaces.ToImmutableList());
+		return new WorkspaceFolder(id, name, type, workspaces.ToImmutableList(), ImmutableList<WorkspaceFolder>.Empty);
 	}
 
 	// Generate multiple folders with a specific count

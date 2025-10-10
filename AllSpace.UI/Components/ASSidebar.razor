@@ -47,7 +47,8 @@
     [Parameter] public EventCallback<WorkspaceFolder> OnSidebarFolderOpen { get; set; }
     [Parameter] public EventCallback<Workspace> OnWorkspaceClick { get; set; }
     [Parameter] public EventCallback OnAddWorkspace { get; set; }
-    [Parameter] public EventCallback<AppInfo> OnAppClick { get; set; }
+    
+    //TODO On Remove Workspace or Folder
 
     private IOrderedEnumerable<ISidebarItem> items = Enumerable.Empty<ISidebarItem>().OrderBy(e => e.Order);
     private string tempExpandedFolderId = string.Empty;

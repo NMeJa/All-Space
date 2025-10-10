@@ -1,14 +1,19 @@
 ﻿@inherits LayoutComponentBase
 <MudLayout>
     <div class="app-container">
-        <ASSidebar Folders="@Folders.ToList()"
-                   Workspaces="@Workspaces.ToList()"
-                   ActiveWorkspaceId="@ActiveWorkspaceId"
-                   OnWorkspaceClick="HandleWorkspaceClick"
-                   OnFolderClick="HandleFolderClick"/>
-
-        <ASWebview ActiveWorkspace="@ActiveWorkspace"
-                   ActiveWorkspaceId="@ActiveWorkspaceId"/>
+        <MudStack Row="true" Reverse="true" Spacing="1">
+            @foreach (var bar in sidebars)
+            {
+                <ASSidebar Folders="@bar.Folders.ToList()"
+                           Workspaces="@bar.Workspaces.ToList()"
+                           ActiveWorkspaceId="@activeWorkspaceId"
+                           OnWorkspaceClick="ChangeWorkspace"
+                           OnAddWorkspace="AddWorkspace"
+                           OnSidebarFolderOpen="AddSidebar"/>
+            }
+        </MudStack>
+        <ASWebview ActiveWorkspace="@activeWorkspace"
+                   ActiveWorkspaceId="@activeWorkspaceId"/>
     </div>
 </MudLayout>
 

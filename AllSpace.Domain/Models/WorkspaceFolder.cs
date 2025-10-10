@@ -8,6 +8,7 @@ public class WorkspaceFolder(
 	string name,
 	WorkspaceFolder.FolderType type,
 	ImmutableList<Workspace> workspaces,
+	ImmutableList<WorkspaceFolder> folders,
 	string? customIconPath = null,
 	string? defaultIconPath = null)
 	: ISidebarItem
@@ -16,6 +17,7 @@ public class WorkspaceFolder(
 	public string Name { get; set; } = name;
 	public FolderType Type { get; set; } = type;
 	public ImmutableList<Workspace> Workspaces { get; set; } = workspaces;
+	public ImmutableList<WorkspaceFolder> Folders { get; set; } = folders;
 	public string? CustomIconPath { get; set; } = customIconPath;
 	public string? DefaultIconPath { get; set; } = defaultIconPath;
 	public int Order { get; set; } = Random.Shared.Next(0, 100);
@@ -35,12 +37,17 @@ public class WorkspaceFolder(
 	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN,
 										 string? customIconPath = null,
 										 string? defaultIconPath = null,
-										 params Workspace[] workspaces)
-		=> new(id, name, type, workspaces?.ToImmutableList() ?? ImmutableList<Workspace>.Empty,
-			   customIconPath, defaultIconPath);
+										 params ISidebarItem[]? items)
+	{
+		var workspaces = items?.OfType<Workspace>().ToImmutableList();
+		var folders = items?.OfType<WorkspaceFolder>().ToImmutableList();
+		return new(id, name, type, workspaces ?? ImmutableList<Workspace>.Empty,
+				   folders ?? ImmutableList<WorkspaceFolder>.Empty,
+				   customIconPath, defaultIconPath);
+	}
 
 	public static WorkspaceFolder Empty(string id, string name, FolderType type = FolderType.DROPDOWN)
-		=> new(id, name, type, ImmutableList<Workspace>.Empty);
+		=> new(id, name, type, ImmutableList<Workspace>.Empty, ImmutableList<WorkspaceFolder>.Empty);
 
 	public WorkspaceFolder AddWorkspace(Workspace workspace)
 	{

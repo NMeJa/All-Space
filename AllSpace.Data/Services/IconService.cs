@@ -18,10 +18,12 @@ public class IconService : IIconService
 	private readonly string _defaultIconsPath;
 	private readonly List<string> _defaultIcons;
 	private readonly Random _random = new();
+	private readonly IAssetPathResolver pathResolver;
 
-	public IconService(HttpClient httpClient)
+	public IconService(HttpClient httpClient, IAssetPathResolver assetPathResolver)
 	{
 		_httpClient = httpClient;
+		pathResolver = assetPathResolver;
 
 		var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 		_iconCachePath = Path.Combine(appDataPath, "AllSpace", "IconCache");
@@ -118,7 +120,8 @@ public class IconService : IIconService
 
 	public async Task<string> LoadSvgIcon(string svgPath)
 	{
-		var result = await File.ReadAllTextAsync(svgPath);
+		var correctPath = pathResolver.GetAssetPath(svgPath);
+		var result = await File.ReadAllTextAsync(correctPath);
 		return result;
 	}
 }
