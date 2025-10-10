@@ -4,13 +4,13 @@ namespace AllSpace.Domain.Models;
 
 public record AppCollectionState(
 	ImmutableList<WorkspaceFolder> Folders,
-	ImmutableList<WorkspaceInfo> Workspaces,
+	ImmutableList<Workspace> Workspaces,
 	ImmutableList<WorkspaceGroup> Groups,
 	ImmutableDictionary<string, AuthProfile> Profiles)
 {
 	public static AppCollectionState Empty => new(
 												  ImmutableList<WorkspaceFolder>.Empty,
-												  ImmutableList<WorkspaceInfo>.Empty,
+												  ImmutableList<Workspace>.Empty,
 												  ImmutableList<WorkspaceGroup>.Empty,
 												  ImmutableDictionary<string, AuthProfile>.Empty
 												 );
@@ -26,7 +26,7 @@ public record AppCollectionState(
 				   : this;
 	}
 
-	public AppCollectionState AddWorkspace(WorkspaceInfo workspace)
+	public AppCollectionState AddWorkspace(Workspace workspace)
 		=> this with { Workspaces = Workspaces.Add(workspace) };
 
 	public AppCollectionState SetProfile(AuthProfile profile)

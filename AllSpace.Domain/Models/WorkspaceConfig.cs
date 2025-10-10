@@ -2,16 +2,16 @@
 
 public record WorkspaceConfig(
 	string Id,
-	WorkspaceInfo Info,
+	Workspace Item,
 	NotificationSettings Notifications,
 	IReadOnlyDictionary<string, string> CustomSettings,
 	DateTime CreatedAt,
 	DateTime ModifiedAt)
 {
-	public static WorkspaceConfig Create(WorkspaceInfo info)
+	public static WorkspaceConfig Create(Workspace item)
 		=> new(Guid.NewGuid().ToString(),
-			   info,
-			   new NotificationSettings(info.Id, true, true),
+			   item,
+			   new NotificationSettings(item.Id, true, true),
 			   new Dictionary<string, string>().AsReadOnly(),
 			   DateTime.UtcNow,
 			   DateTime.UtcNow);

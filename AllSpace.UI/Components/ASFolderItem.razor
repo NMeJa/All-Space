@@ -87,7 +87,6 @@
             </MudTooltip>
         </MudPaper>
     }
-    }
 </div>
 
 @code {
@@ -103,7 +102,7 @@
     {
         base.OnParametersSet();
         // Only allow expansion for a DROPDOWN type
-        if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
+        if (Folder.Type != WorkspaceFolder.FolderType.DROPDOWN)
             isExpanded = IsExpanded;
     }
 

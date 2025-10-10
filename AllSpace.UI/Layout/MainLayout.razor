@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 <MudLayout>
     <div class="app-container">
-        <ASSidebar Folders="@Folders"
+        <ASSidebar Folders="@Folders.ToList()"
                    Workspaces="@Workspaces.ToList()"
                    ActiveWorkspaceId="@ActiveWorkspaceId"
                    OnWorkspaceClick="HandleWorkspaceClick"

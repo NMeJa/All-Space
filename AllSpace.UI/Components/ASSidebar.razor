@@ -1,24 +1,26 @@
-﻿<MudPaper Class="sidebar" Elevation="0">
+﻿@using AllSpace.Domain.Interfaces
+<MudPaper Class="sidebar" Elevation="0">
     <!-- Scrollable content area -->
     <div class="sidebar-scroll-container">
         <MudStack Spacing="2" AlignItems="AlignItems.Center" Class="pa-2 me-2">
-            <!-- Workspace Folders -->
-            @foreach (var folder in Folders)
+            @foreach (var item in items)
             {
-                //IsExpanded is depended on the active folder id in case it uses the sidebar folder view
-                <ASFolderItem
-                    Folder="@folder"
-                    IsExpanded="@(_expandedFolderId == folder.Id)"
-                    OnFolderToggle="@HandleFolderToggle"
-                    OnAppClick="@HandleAppClick"/>
-            }
-
-            <!-- Individual Workspace Items -->
-            @foreach (var workspace in Workspaces)
-            {
-                <ASItem Workspace="@workspace"
-                        IsActive="@(workspace.Id.Equals(ActiveWorkspaceId))"
-                        OnClick="@(() => HandleWorkspaceClick(workspace))"/>
+                switch (item)
+                {
+                    case WorkspaceFolder folder:
+                        //IsExpanded is depended on the active folder id in case it uses the sidebar folder view
+                        <ASFolderItem
+                            Folder="@folder"
+                            IsExpanded="@(expandedFolderId.Equals(folder.Id))"
+                            OnFolderToggle="@HandleFolderToggle"
+                            OnAppClick="@HandleAppClick"/>
+                        break;
+                    case Workspace workspace:
+                        <ASItem Workspace="@workspace"
+                                IsActive="@(workspace.Id.Equals(ActiveWorkspaceId))"
+                                OnClick="@(() => HandleWorkspaceClick(workspace))"/>
+                        break;
+                }
             }
         </MudStack>
     </div>
@@ -43,19 +45,20 @@
 @code {
 
     // Input Parameters
-    [Parameter] public ImmutableList<WorkspaceFolder> Folders { get; set; } = ImmutableList<WorkspaceFolder>.Empty;
-    [Parameter] public List<WorkspaceInfo> Workspaces { get; set; } = new();
+    [Parameter] public List<WorkspaceFolder> Folders { get; set; } = new();
+    [Parameter] public List<Workspace> Workspaces { get; set; } = new();
     [Parameter] public string? ActiveWorkspaceId { get; set; }
 
     // Event Callbacks
     [Parameter] public EventCallback<WorkspaceFolder> OnFolderClick { get; set; }
-    [Parameter] public EventCallback<WorkspaceInfo> OnWorkspaceClick { get; set; }
+    [Parameter] public EventCallback<Workspace> OnWorkspaceClick { get; set; }
     [Parameter] public EventCallback<AppInfo> OnAppClick { get; set; }
     [Parameter] public EventCallback OnAddWorkspace { get; set; }
     [Parameter] public EventCallback OnExploreWorkspaces { get; set; }
 
     [Parameter] public EventCallback<WorkspaceFolder> OnSidebarFolderOpen { get; set; }
 
+    private IOrderedEnumerable<ISidebarItem> items = Enumerable.Empty<ISidebarItem>().OrderBy(e => e.Order);
 
     private async Task HandleSidebarOpen(WorkspaceFolder folder)
     {
@@ -63,8 +66,14 @@
         await OnSidebarFolderOpen.InvokeAsync(folder);
     }
 
-    // Internal state
-    private string? _expandedFolderId;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        items = Folders.Concat<ISidebarItem>(Workspaces)
+                       .OrderByDescending(e => e.Order);
+    }
+
+    private string expandedFolderId = string.Empty;
 
     // Internal methods to handle clicks
     private async Task AddWorkspace()
@@ -79,13 +88,7 @@
 
     private async Task HandleFolderToggle(WorkspaceFolder folder)
     {
-        if (folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
-        {
-            // Toggle expansion state for dropdown folders
-            _expandedFolderId = _expandedFolderId == folder.Id ? null : folder.Id;
-        }
-
-        // Invoke the original folder click callback
+        expandedFolderId = folder.Id;
         await OnFolderClick.InvokeAsync(folder);
     }
 
@@ -98,7 +101,7 @@
         // _expandedFolderId = null;
     }
 
-    private async Task HandleWorkspaceClick(WorkspaceInfo workspace)
+    private async Task HandleWorkspaceClick(Workspace workspace)
     {
         await OnWorkspaceClick.InvokeAsync(workspace);
     }

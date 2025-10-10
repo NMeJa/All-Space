@@ -52,70 +52,70 @@ public static class MockDataGenerator
 								   );
 	}
 
-	public static ImmutableList<WorkspaceInfo> GetMockWorkspaces()
+	public static ImmutableList<Workspace> GetMockWorkspaces()
 	{
 		return ImmutableList.Create(
-									new WorkspaceInfo(
-													  Id: "ws-gmail-personal",
-													  Name: "Gmail Personal",
-													  Url: "https://mail.google.com",
-													  BackgroundColor: BrandColors.Gmail,
-													  Icon: "📧",
-													  ProfileId: "google-personal"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-gmail-work",
-													  Name: "Gmail Work",
-													  Url: "https://mail.google.com/mail/u/1",
-													  BackgroundColor: BrandColors.Gmail,
-													  Icon: "💼",
-													  ProfileId: "google-work"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-slack-team",
-													  Name: "Slack Team",
-													  Url: "https://app.slack.com",
-													  BackgroundColor: BrandColors.Slack,
-													  Icon: "💬",
-													  ProfileId: "slack-team"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-notion",
-													  Name: "Notion",
-													  Url: "https://notion.so",
-													  BackgroundColor: BrandColors.Notion,
-													  Icon: "📝"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-discord",
-													  Name: "Discord",
-													  Url: "https://discord.com/app",
-													  BackgroundColor: BrandColors.Discord,
-													  Icon: "🎮"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-whatsapp",
-													  Name: "WhatsApp",
-													  Url: "https://web.whatsapp.com",
-													  BackgroundColor: BrandColors.WhatsApp,
-													  Icon: "💚"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-github",
-													  Name: "GitHub",
-													  Url: "https://github.com",
-													  BackgroundColor: BrandColors.GitHub,
-													  Icon: "🐙",
-													  ProfileId: "github-main"
-													 ),
-									new WorkspaceInfo(
-													  Id: "ws-youtube",
-													  Name: "YouTube",
-													  Url: "https://youtube.com",
-													  BackgroundColor: BrandColors.YouTube,
-													  Icon: "📺",
-													  ProfileId: "google-personal"
-													 )
+									new Workspace(
+												  id: "ws-gmail-personal",
+												  name: "Gmail Personal",
+												  url: "https://mail.google.com",
+												  backgroundColor: BrandColors.Gmail,
+												  icon: "📧",
+												  profileId: "google-personal"
+												 ),
+									new Workspace(
+												  id: "ws-gmail-work",
+												  name: "Gmail Work",
+												  url: "https://mail.google.com/mail/u/1",
+												  backgroundColor: BrandColors.Gmail,
+												  icon: "💼",
+												  profileId: "google-work"
+												 ),
+									new Workspace(
+												  id: "ws-slack-team",
+												  name: "Slack Team",
+												  url: "https://app.slack.com",
+												  backgroundColor: BrandColors.Slack,
+												  icon: "💬",
+												  profileId: "slack-team"
+												 ),
+									new Workspace(
+												  id: "ws-notion",
+												  name: "Notion",
+												  url: "https://notion.so",
+												  backgroundColor: BrandColors.Notion,
+												  icon: "📝"
+												 ),
+									new Workspace(
+												  id: "ws-discord",
+												  name: "Discord",
+												  url: "https://discord.com/app",
+												  backgroundColor: BrandColors.Discord,
+												  icon: "🎮"
+												 ),
+									new Workspace(
+												  id: "ws-whatsapp",
+												  name: "WhatsApp",
+												  url: "https://web.whatsapp.com",
+												  backgroundColor: BrandColors.WhatsApp,
+												  icon: "💚"
+												 ),
+									new Workspace(
+												  id: "ws-github",
+												  name: "GitHub",
+												  url: "https://github.com",
+												  backgroundColor: BrandColors.GitHub,
+												  icon: "🐙",
+												  profileId: "github-main"
+												 ),
+									new Workspace(
+												  id: "ws-youtube",
+												  name: "YouTube",
+												  url: "https://youtube.com",
+												  backgroundColor: BrandColors.YouTube,
+												  icon: "📺",
+												  profileId: "google-personal"
+												 )
 								   );
 	}
 
@@ -332,7 +332,7 @@ public static class MockDataGenerator
 	}
 
 	// Generate random workspace for testing
-	public static WorkspaceInfo GenerateRandomWorkspace()
+	public static Workspace GenerateRandomWorkspace()
 	{
 		var random = new Random();
 		var names = new[] { "Gmail", "Slack", "Discord", "Teams", "Notion", "Trello" };
@@ -340,13 +340,13 @@ public static class MockDataGenerator
 		var icons = new[] { "📧", "💬", "🎮", "👥", "📝", "📋" };
 
 		var index = random.Next(names.Length);
-		return new WorkspaceInfo(
-								 Id: $"ws-{Guid.NewGuid():N}",
-								 Name: $"{names[index]} {random.Next(1, 100)}",
-								 Url: "https://example.com",
-								 BackgroundColor: colors[index],
-								 Icon: icons[index]
-								);
+		return new Workspace(
+							 id: $"ws-{Guid.NewGuid():N}",
+							 name: $"{names[index]} {random.Next(1, 100)}",
+							 url: "https://example.com",
+							 backgroundColor: colors[index],
+							 icon: icons[index]
+							);
 	}
 
 	// Generate test data with specific counts

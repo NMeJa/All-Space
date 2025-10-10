@@ -39,9 +39,9 @@
 </MudPaper>
 
 @code {
-    [Parameter] public WorkspaceInfo? ActiveWorkspace { get; set; }
+    [Parameter] public Workspace? ActiveWorkspace { get; set; }
     [Parameter] public string? ActiveWorkspaceId { get; set; }
-    [Parameter] public EventCallback<WorkspaceInfo> OnWorkspaceLoaded { get; set; }
+    [Parameter] public EventCallback<Workspace> OnWorkspaceLoaded { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {

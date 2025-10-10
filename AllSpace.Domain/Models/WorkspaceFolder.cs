@@ -1,13 +1,20 @@
 ﻿using System.Collections.Immutable;
+using AllSpace.Domain.Interfaces;
 
 namespace AllSpace.Domain.Models;
 
-public record WorkspaceFolder(
-	string Id,
-	string Name,
-	WorkspaceFolder.FolderType Type,
-	ImmutableList<AppInfo> Apps)
+public class WorkspaceFolder(
+	string id,
+	string name,
+	WorkspaceFolder.FolderType type,
+	ImmutableList<AppInfo> apps) : ISidebarItem
 {
+	public string Id { get; set; } = id;
+	public string Name { get; set; } = name;
+	public FolderType Type { get; set; } = type;
+	public ImmutableList<AppInfo> Apps { get; set; } = apps;
+	public int Order { get; set; } = Random.Shared.Next(0, 100);
+
 	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN, params AppInfo[] apps)
 		=> new(id, name, type, apps?.ToImmutableList() ?? ImmutableList<AppInfo>.Empty);
 
@@ -15,22 +22,32 @@ public record WorkspaceFolder(
 		=> new(id, name, type, ImmutableList<AppInfo>.Empty);
 
 	public WorkspaceFolder AddApp(AppInfo app)
-		=> this with { Apps = Apps.Add(app) };
+	{
+		Apps = Apps.Add(app);
+		return this;
+	}
 
 	public WorkspaceFolder RemoveApp(string appId)
-		=> this with { Apps = Apps.RemoveAll(a => a.Id == appId) };
+	{
+		Apps = Apps.RemoveAll(a => a.Id == appId);
+		return this;
+	}
 
 	public WorkspaceFolder UpdateApp(string appId, Func<AppInfo, AppInfo> updater)
 	{
 		var index = Apps.FindIndex(a => a.Id == appId);
-		return index >= 0
-				   ? this with { Apps = Apps.SetItem(index, updater(Apps[index])) }
-				   : this;
+		if (index >= 0)
+		{
+			Apps = Apps.SetItem(index, updater(Apps[index]));
+		}
+
+		return this;
 	}
 
 	public enum FolderType
 	{
 		DROPDOWN,
+		DROPDOWN_COLLAPSABLE,
 		SIDEBAR
 	}
 }

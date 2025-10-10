@@ -8,9 +8,9 @@ namespace AllSpace.UI.Layout;
 public partial class MainLayout : LayoutComponentBase
 {
 	private ImmutableList<WorkspaceFolder> Folders = ImmutableList<WorkspaceFolder>.Empty;
-	private ImmutableList<WorkspaceInfo> Workspaces = ImmutableList<WorkspaceInfo>.Empty;
+	private ImmutableList<Workspace> Workspaces = ImmutableList<Workspace>.Empty;
 	private string ActiveWorkspaceId = "1";
-	private WorkspaceInfo ActiveWorkspace = null;
+	private Workspace ActiveWorkspace = null;
 
 	protected override void OnInitialized()
 	{
@@ -19,7 +19,7 @@ public partial class MainLayout : LayoutComponentBase
 		Workspaces = MockDataGenerator.GetMockWorkspaces();
 	}
 
-	private void HandleWorkspaceClick(WorkspaceInfo workspace)
+	private void HandleWorkspaceClick(Workspace workspace)
 	{
 		ActiveWorkspace = workspace;
 		ActiveWorkspaceId = workspace.Id;
