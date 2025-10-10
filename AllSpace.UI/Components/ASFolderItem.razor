@@ -1,8 +1,4 @@
 ﻿<div class="folder-wrapper flex-shrink-0">
-    @if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
-    {
-        <div>asdasdasd</div>
-    }
     @if (!isExpanded)
     {
         <!-- Collapsed folder view -->
@@ -26,9 +22,10 @@
             </MudButton>
         </MudContainer>
     }
-    else
+    @* ReSharper disable once ConvertIfStatementToSwitchStatement *@
+    else if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
     {
-        <!-- Expanded folder view with container -->
+        <!-- Expanded DROPDOWN folder view with workspace items -->
         <MudPaper Class="expanded-container" Elevation="2">
             <!-- Header with close button -->
             <div class="expanded-header">
@@ -38,29 +35,58 @@
                                OnClick="@HandleToggle"/>
             </div>
 
-            <!-- Apps in the folder -->
+            <!-- Workspace items from apps -->
             <div class="expanded-apps">
                 @foreach (var app in Apps)
                 {
+                    <!-- Convert each app to a workspace-like item -->
                     <MudTooltip Text="@app.Name" Placement="Placement.Right" Arrow="true">
                         <MudButton OnClick="@(() => HandleAppClick(app))"
                                    Class="pa-0 ma-0 app-button">
-                            <div class="expanded-app-icon"
-                                 style="background-color: @app.Color;">
+                            <MudPaper Class="workspace-item-mini" Elevation="0"
+                                      Style="@($"background-color: {app.Color}")">
                                 @if (!string.IsNullOrEmpty(app.Icon))
                                 {
-                                    <span class="app-emoji-large">@app.Icon</span>
+                                    <span class="workspace-emoji-mini">@app.Icon</span>
                                 }
                                 else
                                 {
-                                    <span class="app-initial">@app.Name[0]</span>
+                                    <span class="workspace-initial">@app.Name[0]</span>
                                 }
-                            </div>
+                            </MudPaper>
                         </MudButton>
                     </MudTooltip>
                 }
             </div>
         </MudPaper>
+    }
+    else if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
+    {
+        <!-- SIDEBAR type - show indicator to open new sidebar -->
+        <MudPaper Class="sidebar-folder-indicator" Elevation="1">
+            <MudTooltip Text="@($"Open {Folder.Name} sidebar")" Placement="Placement.Right">
+                <MudButton OnClick="@HandleSidebarOpen" Class="pa-0 ma-0 sidebar-button">
+                    <div class="sidebar-icon-container">
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowForwardIos"
+                                 Class="sidebar-arrow"
+                                 Size="Size.Small"/>
+                        <div Class="folder-grid-mini">
+                            @foreach (var app in Apps.Take(4))
+                            {
+                                <div class="app-icon-mini"
+                                     style="background-color: @app.Color;">
+                                    @if (!string.IsNullOrEmpty(app.Icon))
+                                    {
+                                        <span class="app-emoji-mini">@app.Icon</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </MudButton>
+            </MudTooltip>
+        </MudPaper>
+    }
     }
 </div>
 
@@ -69,12 +95,14 @@
     [Parameter] public bool IsExpanded { get; set; }
     [Parameter] public EventCallback<WorkspaceFolder> OnFolderToggle { get; set; }
     [Parameter] public EventCallback<AppInfo> OnAppClick { get; set; }
+    [Parameter] public EventCallback<WorkspaceFolder> OnSidebarOpen { get; set; }
 
     private bool isExpanded;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        // Only allow expansion for a DROPDOWN type
         if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
             isExpanded = IsExpanded;
     }
@@ -83,13 +111,25 @@
 
     private async Task HandleToggle()
     {
-        isExpanded = !isExpanded;
-        await OnFolderToggle.InvokeAsync(Folder);
+        if (Folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
+        {
+            isExpanded = !isExpanded;
+            await OnFolderToggle.InvokeAsync(Folder);
+        }
+        else if (Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
+        {
+            await HandleSidebarOpen();
+        }
     }
 
     private async Task HandleAppClick(AppInfo app)
     {
         await OnAppClick.InvokeAsync(app);
+    }
+
+    private async Task HandleSidebarOpen()
+    {
+        await OnSidebarOpen.InvokeAsync(Folder);
     }
 
 }
@@ -135,9 +175,8 @@
         padding: 4px;
         width: 56px;
         border: 1px solid #1e1f22;
-        animation: expandIn 0.2s ease-out;
+        transition: all 0.2s ease-out;
     }
-
 
     .expanded-header {
         display: flex;
@@ -170,6 +209,95 @@
         overflow-x: hidden;
     }
 
+    /* Workspace-like items in expanded dropdown */
+    .workspace-item-mini {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .workspace-item-mini:hover {
+        border-radius: 12px;
+        transform: scale(1.05);
+    }
+
+    .workspace-emoji-mini {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .workspace-initial {
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+
+    /* Sidebar folder indicator styles */
+    .sidebar-folder-indicator {
+        width: 56px;
+        height: 56px;
+        background-color: #313338;
+        border-radius: 16px;
+        border: 2px solid #5865f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .sidebar-folder-indicator:hover {
+        background-color: #3f4147;
+        border-color: #7983f5;
+    }
+
+    .sidebar-button {
+        width: 100%;
+        height: 100%;
+    }
+
+    .sidebar-icon-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar-arrow {
+        position: absolute;
+        right: 2px;
+        color: #5865f2;
+        animation: pulse 2s infinite;
+    }
+
+    .folder-grid-mini {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 1px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .app-icon-mini {
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-emoji-mini {
+        font-size: 8px;
+        line-height: 1;
+    }
+
     /* Scrollbar for expanded apps */
     .expanded-apps::-webkit-scrollbar {
         width: 2px;
@@ -186,33 +314,5 @@
 
     .app-button {
         width: 100%;
-    }
-
-    .expanded-app-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-
-    .expanded-app-icon:hover {
-        border-radius: 12px;
-        transform: scale(1.05);
-    }
-
-    .app-emoji-large {
-        font-size: 18px;
-        line-height: 1;
-    }
-
-    .app-initial {
-        color: white;
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
     }
 </style>

@@ -54,6 +54,15 @@
     [Parameter] public EventCallback OnAddWorkspace { get; set; }
     [Parameter] public EventCallback OnExploreWorkspaces { get; set; }
 
+    [Parameter] public EventCallback<WorkspaceFolder> OnSidebarFolderOpen { get; set; }
+
+
+    private async Task HandleSidebarOpen(WorkspaceFolder folder)
+    {
+        // Handle opening a new sidebar view
+        await OnSidebarFolderOpen.InvokeAsync(folder);
+    }
+
     // Internal state
     private string? _expandedFolderId;
 
@@ -70,10 +79,13 @@
 
     private async Task HandleFolderToggle(WorkspaceFolder folder)
     {
-        // Toggle expansion state
-        _expandedFolderId = _expandedFolderId == folder.Id ? null : folder.Id;
+        if (folder.Type == WorkspaceFolder.FolderType.DROPDOWN)
+        {
+            // Toggle expansion state for dropdown folders
+            _expandedFolderId = _expandedFolderId == folder.Id ? null : folder.Id;
+        }
 
-        // Also invoke the original folder click callback
+        // Invoke the original folder click callback
         await OnFolderClick.InvokeAsync(folder);
     }
 
