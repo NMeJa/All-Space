@@ -1,10 +1,18 @@
 :root {
     --blazor-load-percentage: 0%;
     --blazor-load-percentage-text: "Loading...";
+    --sidebar-bg: #2b2d31;
+    --sidebar-hover: #313338;
+    --divider-color: #1e1f22;
+    --folder-color: #5865f2;
+    --active-indicator: #ffffff;
 }
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 h1:focus {
@@ -116,4 +124,8 @@ code {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+.mud-layout {
+    min-height: 100vh;
 }

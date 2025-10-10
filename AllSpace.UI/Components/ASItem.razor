@@ -1,0 +1,32 @@
+﻿<div class="item-container">
+    @if (IsActive)
+    {
+        <div class="active-indicator"></div>
+    }
+    <MudPaper Class="@GetWorkspaceClass()" Elevation="0" @onclick="OnClick">
+        @if (!string.IsNullOrEmpty(Workspace.ImageUrl))
+        {
+            <MudAvatar Image="@Workspace.ImageUrl" Size="Size.Large"/>
+        }
+        else if (!string.IsNullOrEmpty(Workspace.Icon))
+        {
+            <MudIcon Icon="@Workspace.Icon" Style="color: white; font-size: 24px;"/>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6" Style="color: white;">@Workspace.Name.Substring(0, 1)</MudText>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    [Parameter] public WorkspaceInfo Workspace { get; set; } = default!;
+    [Parameter] public bool IsActive { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private string GetWorkspaceClass()
+    {
+        return IsActive ? "workspace-item active" : "workspace-item";
+    }
+
+}

@@ -1,0 +1,34 @@
+﻿<MudLayout>
+    <MudAppBar Elevation="0" Fixed="false" Style="display: none;"/>
+    <MudMainContent Class="main-layout">
+        <div class="app-container">
+            <ASSidebar Folders="@Folders"
+                       Workspaces="@Workspaces"
+                       ActiveWorkspaceId="@ActiveWorkspaceId"
+                       OnWorkspaceClick="HandleWorkspaceClick"
+                       OnFolderClick="HandleFolderClick"/>
+
+            <ASWebview ActiveWorkspace="@ActiveWorkspace"
+                       ActiveWorkspaceId="@ActiveWorkspaceId"/>
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private ImmutableList<WorkspaceFolder> Folders = ImmutableList<WorkspaceFolder>.Empty;
+    private ImmutableList<WorkspaceInfo> Workspaces = ImmutableList<WorkspaceInfo>.Empty;
+    private string ActiveWorkspaceId = "1";
+    private WorkspaceInfo ActiveWorkspace;
+
+    private void HandleWorkspaceClick(WorkspaceInfo workspace)
+    {
+        ActiveWorkspace = workspace;
+        ActiveWorkspaceId = workspace.Id;
+    }
+
+    private void HandleFolderClick(WorkspaceFolder folder)
+    {
+        // Expand folder logic
+    }
+
+}

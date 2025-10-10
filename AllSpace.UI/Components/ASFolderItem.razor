@@ -1,0 +1,24 @@
+﻿<MudPaper Class="folder-item" Elevation="0" @onclick="OnClick">
+    <div class="folder-grid">
+        @foreach (var app in Apps.Take(4))
+        {
+            <div class="app-icon" style="background-color: @app.Color;">
+                @if (!string.IsNullOrEmpty(app.Icon))
+                {
+                    <MudIcon Icon="@app.Icon" Size="Size.Small" Style="color: white;"/>
+                }
+            </div>
+        }
+        @for (int i = Apps.Count; i < 4; i++)
+        {
+            <div class="app-icon empty"></div>
+        }
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter] public WorkspaceFolder Folder { get; set; } = default!;
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private ImmutableList<AppInfo> Apps => Folder.Apps;
+}

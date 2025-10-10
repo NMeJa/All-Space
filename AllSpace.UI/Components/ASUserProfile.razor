@@ -1,0 +1,24 @@
+﻿<MudMenu AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.BottomLeft">
+    <ActivatorContent>
+        <MudAvatar Size="Size.Large" Class="user-avatar">
+            @if (!string.IsNullOrEmpty(UserImageUrl))
+            {
+                <MudImage Src="@UserImageUrl"/>
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Person"/>
+            }
+        </MudAvatar>
+    </ActivatorContent>
+    <ChildContent>
+        <MudMenuItem Icon="@Icons.Material.Filled.Settings">Settings</MudMenuItem>
+        <MudMenuItem Icon="@Icons.Material.Filled.Person">Profile</MudMenuItem>
+        <MudDivider/>
+        <MudMenuItem Icon="@Icons.Material.Filled.Logout">Logout</MudMenuItem>
+    </ChildContent>
+</MudMenu>
+
+@code {
+    [Parameter] public string UserImageUrl { get; set; }
+}

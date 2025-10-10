@@ -1,0 +1,55 @@
+﻿<MudPaper Class="webview-content" Elevation="0">
+    @if (ActiveWorkspace == null)
+    {
+        <MudContainer Class="welcome-container">
+            <MudStack AlignItems="AlignItems.Center" Spacing="4">
+                <MudPaper Class="welcome-icon" Elevation="0">
+                    <MudIcon Icon="@Icons.Material.Filled.RocketLaunch"
+                             Style="font-size: 48px; color: #0a0a0a;"/>
+                </MudPaper>
+
+                <MudText Typo="Typo.h5" Color="Color.Dark">
+                    Welcome to Workspace Manager
+                </MudText>
+
+                <MudChip Color="Color.Default" Size="Size.Small" T="string">
+                    Active Workspace ID: @(ActiveWorkspaceId ?? "None")
+                </MudChip>
+
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Align="Align.Center">
+                    This is where the webview for the selected app would be displayed.
+                </MudText>
+
+                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Dense="true">
+                    💡 Click folders to see apps inside • Click apps to load them
+                </MudAlert>
+            </MudStack>
+        </MudContainer>
+    }
+    else
+    {
+        <!-- Placeholder for when workspace is active -->
+        <div class="webview-container" id="webview-@ActiveWorkspace.Id">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Loading @ActiveWorkspace.Name...
+            </MudText>
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter] public WorkspaceInfo? ActiveWorkspace { get; set; }
+    [Parameter] public string? ActiveWorkspaceId { get; set; }
+    [Parameter] public EventCallback<WorkspaceInfo> OnWorkspaceLoaded { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ActiveWorkspace != null)
+        {
+            // Notify the Photino window to create/switch WebView
+            await OnWorkspaceLoaded.InvokeAsync(ActiveWorkspace);
+        }
+    }
+
+}

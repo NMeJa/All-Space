@@ -21,7 +21,12 @@ internal class Program
 
 		var app = builder.Build();
 
-		app.MainWindow.SetTitle("AllSpace");
+		app.MainWindow
+		   .SetSize(1400, 900)
+		   .Center()
+		   .SetDevToolsEnabled(true)
+		   .SetLogVerbosity(0)
+		   .SetTitle("AllSpace");
 
 		AppDomain.CurrentDomain.UnhandledException += (sender, err) =>
 			{
