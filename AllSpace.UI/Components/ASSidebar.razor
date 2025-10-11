@@ -80,11 +80,9 @@
 
     private async Task HandleFolderToggle(WorkspaceFolder folder)
     {
-        await CollapseCollapsable();
-        await Task.Delay(50);
-        var newState = State.ToggleFolder(folder.Id);
+        var stateAfterCollapse = await CollapseCollapsable();
+        var newState = stateAfterCollapse.ToggleFolder(folder.Id);
         await OnStateChanged.InvokeAsync(newState);
-
         await HandleSidebarOpen(folder);
     }
 
@@ -101,30 +99,30 @@
 
         if (!isFromCollapsable)
         {
-            await CollapseCollapsable();
+            var newState = await CollapseCollapsable();
+            await OnStateChanged.InvokeAsync(newState);
         }
 
         await OnWorkspaceClick.InvokeAsync(workspace);
         await HandleSidebarOpen(folder);
     }
 
-    private async Task CollapseCollapsable()
+    private async Task<SidebarState> CollapseCollapsable()
     {
-        Console.WriteLine(1);
+        // ReSharper disable once InvertIf
         if (State.ExpandedFolderIds.Any())
         {
-            Console.WriteLine(2);
             var newExpandedIds = State.ExpandedFolderIds
                                       .Where(id => !Folders.Any(f => f.Id == id && f.Type == WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE))
                                       .ToList();
 
             if (newExpandedIds.Count != State.ExpandedFolderIds.Count)
             {
-                Console.WriteLine(3);
-                var newState = State with { ExpandedFolderIds = newExpandedIds };
-                await OnStateChanged.InvokeAsync(newState);
+                return State with { ExpandedFolderIds = newExpandedIds };
             }
         }
+
+        return State; //if no change
     }
 
     private ElementReference scrollContainer;
