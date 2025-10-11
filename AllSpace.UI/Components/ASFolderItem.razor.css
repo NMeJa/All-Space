@@ -1,0 +1,141 @@
+.folder-wrapper {
+    width: 56px;
+}
+
+.folder-item {
+    border-radius: 50%;
+    background-color: #5865f2;
+    transition: border-radius 0.2s;
+    cursor: pointer;
+}
+
+.folder-item:hover {
+    border-radius: 16px;
+}
+
+.folder-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.folder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    width: 40px;
+    height: 40px;
+}
+
+.workspace-icon-mini {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.workspace-placeholder {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.workspace-initial-mini {
+    color: white;
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Expanded container styles */
+.expanded-container {
+    background-color: #313338;
+    border-radius: 8px;
+    padding: 4px;
+    width: 56px;
+    border: 1px solid #1e1f22;
+    transition: all 0.2s ease-out;
+}
+
+.expanded-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 2px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #1e1f22;
+}
+
+.close-button {
+    color: #b5bac1;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.close-button:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.expanded-workspaces {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 2px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.workspace-button {
+    width: 100%;
+}
+
+.workspace-item-mini {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.workspace-item-mini:hover {
+    border-radius: 12px;
+    transform: scale(1.05);
+}
+
+.workspace-icon-expanded {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.workspace-initial {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Scrollbar for expanded workspaces */
+.expanded-workspaces::-webkit-scrollbar {
+    width: 2px;
+}
+
+.expanded-workspaces::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.expanded-workspaces::-webkit-scrollbar-thumb {
+    background: #1e1f22;
+    border-radius: 1px;
+}

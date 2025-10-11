@@ -97,6 +97,8 @@ public partial class ASSidebar
 		return State; //if no change
 	}
 
+	private IJSObjectReference? module;
+
 	private ElementReference scrollContainer;
 	private DotNetObjectReference<ASSidebar>? dotNetRef;
 	private CancellationTokenSource? scrollCancellationTokenSource;
@@ -107,14 +109,16 @@ public partial class ASSidebar
 		{
 			dotNetRef = DotNetObjectReference.Create(this);
 
+			module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/ASSidebar.razor.js");
+
 			// Restore scroll position
 			if (State.ScrollPosition > 0)
 			{
-				await JsRuntime.InvokeVoidAsync("scrollToPosition", scrollContainer, State.ScrollPosition);
+				await module.InvokeVoidAsync("scrollToPosition", scrollContainer, State.ScrollPosition);
 			}
 
 			// Set up scroll listener
-			await JsRuntime.InvokeVoidAsync("addScrollListener", scrollContainer, dotNetRef);
+			await module.InvokeVoidAsync("addScrollListener", scrollContainer, dotNetRef);
 		}
 	}
 
@@ -148,10 +152,16 @@ public partial class ASSidebar
 			}, token, TaskContinuationOptions.NotOnCanceled, TaskScheduler.Default);
 	}
 
-	public void Dispose()
+	public async ValueTask DisposeAsync()
 	{
-		scrollCancellationTokenSource?.Cancel();
-		scrollCancellationTokenSource?.Dispose();
+		if (scrollCancellationTokenSource is not null)
+		{
+			await scrollCancellationTokenSource.CancelAsync();
+			scrollCancellationTokenSource.Dispose();
+		}
+
 		dotNetRef?.Dispose();
+		if (module is not null) await module.DisposeAsync();
+		GC.SuppressFinalize(this);
 	}
 }

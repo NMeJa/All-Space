@@ -1,0 +1,42 @@
+.app-container-grid {
+    display: grid;
+    width: 100%;
+    height: 100vh;
+}
+
+/* LEFT: Sidebar | Webview */
+.layout-left {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "sidebar webview";
+}
+
+/* RIGHT: Webview | Sidebar */
+.layout-right {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "webview sidebar";
+}
+
+/* UP: Sidebar on top */
+.layout-up {
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 
+            "sidebar"
+            "webview";
+}
+
+/* DOWN: Sidebar on bottom */
+.layout-down {
+    grid-template-rows: 1fr auto;
+    grid-template-areas: 
+            "webview"
+            "sidebar";
+}
+
+.sidebar-area {
+    grid-area: sidebar;
+}
+
+.webview-area {
+    grid-area: webview;
+    background-color: #ffffff;
+}

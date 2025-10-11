@@ -1,0 +1,93 @@
+/* Vertical sidebar (default - LEFT/RIGHT) */
+.sidebar-vertical {
+    width: 80px;
+    height: 100vh;
+    background-color: #2b2d31;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.sidebar-scroll-vertical {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    min-height: 0;
+}
+
+/* Horizontal sidebar (UP/DOWN) */
+.sidebar-horizontal {
+    width: 100%;
+    height: 80px;
+    background-color: #2b2d31;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.sidebar-scroll-horizontal {
+    flex: 1;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+/* Scrollbar styling for vertical */
+/*.sidebar-scroll-vertical::-webkit-scrollbar {*/
+/*    width: 4px;*/
+/*}*/
+
+/*.sidebar-scroll-vertical::-webkit-scrollbar-track {*/
+/*    background: transparent;*/
+/*}*/
+
+/*.sidebar-scroll-vertical::-webkit-scrollbar-thumb {*/
+/*    background: #1e1f22;*/
+/*    border-radius: 2px;*/
+/*}*/
+
+/*!* Scrollbar styling for horizontal *!*/
+/*.sidebar-scroll-horizontal::-webkit-scrollbar {*/
+/*    height: 4px;*/
+/*}*/
+
+/*.sidebar-scroll-horizontal::-webkit-scrollbar-track {*/
+/*    background: transparent;*/
+/*}*/
+
+/*.sidebar-scroll-horizontal::-webkit-scrollbar-thumb {*/
+/*    background: #1e1f22;*/
+/*    border-radius: 2px;*/
+/*}*/
+
+/* Bottom section for vertical */
+.sidebar-bottom {
+    flex-shrink: 0;
+    border-top: 1px solid #1e1f22;
+    background-color: #2b2d31;
+}
+
+/* End section for horizontal */
+.sidebar-end {
+    flex-shrink: 0;
+    border-left: 1px solid #1e1f22;
+    background-color: #2b2d31;
+}
+
+.action-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #1e1f22;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.action-button:hover {
+    background-color: #313338;
+    border-radius: 16px;
+}
