@@ -2,9 +2,12 @@
 @implements IDisposable
 @inject IJSRuntime JsRuntime
 
-<MudPaper Class="sidebar" Elevation="0">
-    <div class="sidebar-scroll-container" @ref="scrollContainer">
-        <MudStack Spacing="2" AlignItems="AlignItems.Center" Class="pa-2 me-2">
+<MudPaper Class="@GetSidebarClass()" Elevation="0">
+    <div class="@GetScrollContainerClass()" @ref="scrollContainer">
+        <MudStack Spacing="2"
+                  AlignItems="@(IsHorizontal ? AlignItems.Center : AlignItems.Center)"
+                  Row="@IsHorizontal"
+                  Class="@(IsHorizontal ? "px-2" : "pa-2 me-2")">
             @foreach (var item in items)
             {
                 switch (item)
@@ -29,8 +32,11 @@
 
     @if (NestingOrder == 0)
     {
-        <!-- Fixed bottom content only on main sidebar -->
-        <MudStack Spacing="2" AlignItems="AlignItems.Center" Class="sidebar-bottom pa-2 me-2">
+        <!-- Fixed bottom/right content only on main sidebar -->
+        <MudStack Spacing="2"
+                  AlignItems="AlignItems.Center"
+                  Row="@IsHorizontal"
+                  Class="@GetBottomClass()">
             <MudIconButton Icon="@Icons.Material.Filled.Add"
                            Class="action-button"
                            Size="Size.Large"
@@ -41,6 +47,8 @@
 </MudPaper>
 
 @code {
+    [Parameter] public bool IsHorizontal { get; set; } = false;
+
     [Parameter] public string SidebarId { get; set; } = string.Empty;
     [Parameter] public SidebarState State { get; set; } = default!;
     [Parameter] public WorkspaceFolder Folder { get; set; } = default!;
@@ -57,6 +65,9 @@
     private List<Workspace> Workspaces { get; set; } = new();
     private IOrderedEnumerable<ISidebarItem> items = Enumerable.Empty<ISidebarItem>().OrderBy(e => e.Order);
 
+    private string GetSidebarClass() => IsHorizontal ? "sidebar-horizontal" : "sidebar-vertical";
+    private string GetScrollContainerClass() => IsHorizontal ? "sidebar-scroll-horizontal" : "sidebar-scroll-vertical";
+    private string GetBottomClass() => IsHorizontal ? "sidebar-end px-2" : "sidebar-bottom pa-2 me-2";
 
     protected override void OnParametersSet()
     {
@@ -80,7 +91,7 @@
 
     private async Task HandleFolderToggle(WorkspaceFolder folder)
     {
-        var stateAfterCollapse = await CollapseCollapsable();
+        var stateAfterCollapse = CollapseCollapsable();
         var newState = stateAfterCollapse.ToggleFolder(folder.Id);
         await OnStateChanged.InvokeAsync(newState);
         await HandleSidebarOpen(folder);
@@ -99,7 +110,7 @@
 
         if (!isFromCollapsable)
         {
-            var newState = await CollapseCollapsable();
+            var newState = CollapseCollapsable();
             await OnStateChanged.InvokeAsync(newState);
         }
 
@@ -107,7 +118,7 @@
         await HandleSidebarOpen(folder);
     }
 
-    private async Task<SidebarState> CollapseCollapsable()
+    private SidebarState CollapseCollapsable()
     {
         // ReSharper disable once InvertIf
         if (State.ExpandedFolderIds.Any())
@@ -185,8 +196,25 @@
 
 }
 
+<script>
+    window.scrollToPosition = (element, position) => {
+        if (element) {
+            element.scrollTop = position;
+        }
+    };
+
+    window.addScrollListener = (element, dotNetRef) => {
+        if (element) {
+            element.addEventListener('scroll', (e) => {
+                dotNetRef.invokeMethodAsync('OnScroll', e.target.scrollTop);
+            });
+        }
+    };
+</script>
+
 <style>
-    .sidebar {
+    /* Vertical sidebar (default - LEFT/RIGHT) */
+    .sidebar-vertical {
         width: 80px;
         height: 100vh;
         background-color: #2b2d31;
@@ -195,34 +223,69 @@
         position: relative;
     }
 
-    .sidebar-scroll-container {
+    .sidebar-scroll-vertical {
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        min-height: 0; /* Important for Firefox */
+        min-height: 0;
     }
 
-    /* Custom scrollbar styling */
-    .sidebar-scroll-container::-webkit-scrollbar {
+    /* Horizontal sidebar (UP/DOWN) */
+    .sidebar-horizontal {
+        width: 100%;
+        height: 80px;
+        background-color: #2b2d31;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+    }
+
+    .sidebar-scroll-horizontal {
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        min-width: 0;
+    }
+
+    /* Scrollbar styling for vertical */
+    .sidebar-scroll-vertical::-webkit-scrollbar {
         width: 4px;
     }
 
-    .sidebar-scroll-container::-webkit-scrollbar-track {
+    .sidebar-scroll-vertical::-webkit-scrollbar-track {
         background: transparent;
     }
 
-    .sidebar-scroll-container::-webkit-scrollbar-thumb {
+    .sidebar-scroll-vertical::-webkit-scrollbar-thumb {
         background: #1e1f22;
         border-radius: 2px;
     }
 
-    .sidebar-scroll-container::-webkit-scrollbar-thumb:hover {
-        background: #313338;
+    /* Scrollbar styling for horizontal */
+    .sidebar-scroll-horizontal::-webkit-scrollbar {
+        height: 4px;
     }
 
+    .sidebar-scroll-horizontal::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar-scroll-horizontal::-webkit-scrollbar-thumb {
+        background: #1e1f22;
+        border-radius: 2px;
+    }
+
+    /* Bottom section for vertical */
     .sidebar-bottom {
         flex-shrink: 0;
         border-top: 1px solid #1e1f22;
+        background-color: #2b2d31;
+    }
+
+    /* End section for horizontal */
+    .sidebar-end {
+        flex-shrink: 0;
+        border-left: 1px solid #1e1f22;
         background-color: #2b2d31;
     }
 
@@ -240,18 +303,3 @@
         border-radius: 16px;
     }
 </style>
-<script>
-    window.scrollToPosition = (element, position) => {
-        if (element) {
-            element.scrollTop = position;
-        }
-    };
-
-    window.addScrollListener = (element, dotNetRef) => {
-        if (element) {
-            element.addEventListener('scroll', (e) => {
-                dotNetRef.invokeMethodAsync('OnScroll', e.target.scrollTop);
-            });
-        }
-    };
-</script>

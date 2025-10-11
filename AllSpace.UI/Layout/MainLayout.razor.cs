@@ -111,4 +111,6 @@ public partial class MainLayout : LayoutComponentBase
 	{
 		// Save states to local storage if needed
 	}
+
+
 }
