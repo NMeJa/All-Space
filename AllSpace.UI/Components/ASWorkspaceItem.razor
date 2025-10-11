@@ -1,6 +1,4 @@
-﻿@inject Data.Services.IIconService IconService
-
-<MudContainer Class="ma-0 flex-shrink-0" Fixed="true" Gutters="false">
+﻿<MudItem Class="ma-0 pa-0 flex-shrink-0 flex-grow-0" Fixed="true" Gutters="false">
     <MudButton OnClick="@HandleClick" Class="pa-0">
         <MudPaper Class="@GetWorkspaceClass()" Elevation="0" Width="55" Height="55"
                   Style="@($"background-color: {Workspace.BackgroundColor}")">
@@ -10,7 +8,7 @@
                        Title="@Workspace.Name"/>
         </MudPaper>
     </MudButton>
-</MudContainer>
+</MudItem>
 
 @code {
     [Parameter] public Workspace Workspace { get; set; } = default!;

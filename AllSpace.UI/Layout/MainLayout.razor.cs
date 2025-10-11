@@ -20,8 +20,8 @@ public partial class MainLayout : LayoutComponentBase
 	protected override void OnInitialized()
 	{
 		base.OnInitialized();
-		workspaces = MockDataGenerator.GenerateRandomWorkspaces(5);
-		folders = MockDataGenerator.GenerateFolders(30);
+		workspaces = MockDataGenerator.GetMockWorkspaces();
+		folders = MockDataGenerator.GenerateFolders(0);
 		defaultFolder = new[]
 		{
 			new WorkspaceFolder("default", "Default", WorkspaceFolder.FolderType.SIDEBAR,
@@ -111,6 +111,4 @@ public partial class MainLayout : LayoutComponentBase
 	{
 		// Save states to local storage if needed
 	}
-
-
 }

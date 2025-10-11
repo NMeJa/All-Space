@@ -34,8 +34,8 @@
 
 @code {
     private Direction direction = Direction.UP;
-    private bool IsHorizontalLayout => direction is Direction.LEFT or Direction.RIGHT;
-    private bool IsReverse => direction is Direction.LEFT;
+    private bool IsHorizontalLayout => direction is Direction.UP or Direction.DOWN;
+    private bool IsReverse => direction is Direction.LEFT or Direction.UP;
 
     private string GetGridClass()
     {
