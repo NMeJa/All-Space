@@ -1,21 +1,32 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
+
 <MudLayout>
     <div class="app-container">
         <MudStack Row="true" Reverse="true" Spacing="1">
-            @foreach (var bar in sidebars)
+            @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i)))
             {
-                <ASSidebar Folders="@bar.Folders.ToList()"
-                           Workspaces="@bar.Workspaces.ToList()"
+                var index = sidebars.Count - i - 1;
+                var sidebarId = GetSidebarId(barFolder, index);
+                var state = GetOrCreateSidebarState(sidebarId);
+
+                <ASSidebar @key="@sidebarId"
+                           SidebarId="@sidebarId"
+                           State="@state"
+                           NestingOrder="@index"
+                           Folder="@barFolder"
                            ActiveWorkspaceId="@activeWorkspaceId"
                            OnWorkspaceClick="ChangeWorkspace"
                            OnAddWorkspace="AddWorkspace"
-                           OnSidebarFolderOpen="AddSidebar"/>
+                           OnSidebarFolderOpen="AddSidebar"
+                           OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/>
             }
         </MudStack>
         <ASWebview ActiveWorkspace="@activeWorkspace"
                    ActiveWorkspaceId="@activeWorkspaceId"/>
     </div>
 </MudLayout>
+
 
 <style>
     .main-layout {
@@ -28,5 +39,4 @@
         width: 100%;
         height: 100vh;
     }
-
 </style>

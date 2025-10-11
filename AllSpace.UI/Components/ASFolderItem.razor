@@ -13,7 +13,7 @@
         break;
 }
 <div class="folder-wrapper flex-shrink-0">
-    @if (!isExpanded || Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
+    @if (!IsExpanded || Folder.Type == WorkspaceFolder.FolderType.SIDEBAR)
     {
         <!-- Collapsed folder view -->
         <MudContainer Class="ma-0" Fixed="true" Gutters="false">
@@ -106,9 +106,7 @@
     [Parameter] public bool IsExpanded { get; set; }
     [Parameter] public EventCallback<WorkspaceFolder> OnFolderToggle { get; set; }
     [Parameter] public EventCallback<Workspace> OnWorkspaceClick { get; set; }
-    [Parameter] public EventCallback<WorkspaceFolder> OnSidebarOpen { get; set; }
 
-    private bool isExpanded;
     private IconInfo icon;
     private ImmutableList<Workspace> Workspaces => Folder.Workspaces;
 
@@ -116,42 +114,16 @@
     {
         base.OnParametersSet();
         icon = Folder.GetIcon();
-
-        // Handle expansion based on the folder type
-        if (Folder.Type != WorkspaceFolder.FolderType.DROPDOWN)
-            isExpanded = IsExpanded;
     }
 
     private async Task HandleToggle()
     {
-        switch (Folder.Type)
-        {
-            case WorkspaceFolder.FolderType.DROPDOWN:
-                isExpanded = !isExpanded;
-                await OnFolderToggle.InvokeAsync(Folder);
-                break;
-
-            case WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE:
-                isExpanded = !isExpanded;
-                if (isExpanded) await OnFolderToggle.InvokeAsync(Folder); //don't notify on close
-                break;
-
-            case WorkspaceFolder.FolderType.SIDEBAR:
-            default:
-                await HandleSidebarOpen();
-                await OnFolderToggle.InvokeAsync(Folder);
-                break;
-        }
+        await OnFolderToggle.InvokeAsync(Folder);
     }
 
     private async Task HandleWorkspaceClick(Workspace workspace)
     {
         await OnWorkspaceClick.InvokeAsync(workspace);
-    }
-
-    private async Task HandleSidebarOpen()
-    {
-        await OnSidebarOpen.InvokeAsync(Folder);
     }
 
 }

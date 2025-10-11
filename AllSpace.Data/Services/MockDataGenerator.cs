@@ -110,23 +110,82 @@ public static class MockDataGenerator
 						 .ToList();
 	}
 
-	// Generate random folder with workspaces
-	public static WorkspaceFolder GenerateRandomFolder()
+	// Generate random folder with optional nesting
+	public static WorkspaceFolder GenerateRandomFolder(int currentLevel = 0, int maxLevel = 3)
 	{
 		var id = $"folder-{Guid.NewGuid():N}";
 		var name = $"Folder {random.Next(1, 1000)}";
-		var type = (WorkspaceFolder.FolderType)random.Next(0, 3);
-		var workspaceCount = random.Next(2, 8); // 2 to 7 workspaces
+
+		// Choose folder type based on level and randomness
+		var type = DetermineNestedFolderType(currentLevel, maxLevel);
+
+		// Generate workspaces (1-5 workspaces per folder)
+		var workspaceCount = random.Next(1, 6);
 		var workspaces = GenerateRandomWorkspaces(workspaceCount);
 
-		return new WorkspaceFolder(id, name, type, workspaces.ToImmutableList(), ImmutableList<WorkspaceFolder>.Empty);
+		// Generate nested folders if we haven't reached max depth
+		var nestedFolders = GenerateNestedFolders(currentLevel, maxLevel);
+
+		return new WorkspaceFolder(
+								   id,
+								   name,
+								   type,
+								   workspaces.ToImmutableList(),
+								   nestedFolders.ToImmutableList()
+								  );
 	}
 
-	// Generate multiple folders with a specific count
-	public static List<WorkspaceFolder> GenerateFolders(int count)
+	private static WorkspaceFolder.FolderType DetermineNestedFolderType(int currentLevel, int maxLevel)
 	{
-		var folders = ImmutableList.CreateBuilder<WorkspaceFolder>();
-		var predefinedFolders = GetMockFolders();
+		// If we're at max level, don't create SIDEBAR type (no more nesting)
+		if (currentLevel >= maxLevel)
+		{
+			return random.Next(0, 2) == 0
+					   ? WorkspaceFolder.FolderType.DROPDOWN
+					   : WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE;
+		}
+
+		// 40% chance of SIDEBAR (nested), 30% DROPDOWN, 30% DROPDOWN_COLLAPSABLE
+		var typeChance = random.Next(0, 10);
+		return typeChance switch
+		{
+			< 4 => WorkspaceFolder.FolderType.SIDEBAR,
+			< 7 => WorkspaceFolder.FolderType.DROPDOWN,
+			_   => WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE
+		};
+	}
+
+	private static List<WorkspaceFolder> GenerateNestedFolders(int currentLevel, int maxLevel)
+	{
+		var nestedFolders = new List<WorkspaceFolder>();
+
+		// Don't create nested folders if we're at max level
+		if (currentLevel >= maxLevel)
+			return nestedFolders;
+
+		// 60% chance to have nested folders, with decreasing probability at deeper levels
+		var nestingChance = Math.Max(0.2, 0.8 - (currentLevel * 0.15));
+
+		if (random.NextDouble() > nestingChance)
+			return nestedFolders;
+
+		// Generate 1-4 nested folders, fewer at deeper levels
+		var maxNested = Math.Max(1, 4 - currentLevel);
+		var nestedCount = random.Next(1, maxNested + 1);
+
+		for (int i = 0; i < nestedCount; i++)
+		{
+			nestedFolders.Add(GenerateRandomFolder(currentLevel + 1, maxLevel));
+		}
+
+		return nestedFolders;
+	}
+
+	// Generate multiple folders with nesting
+	public static List<WorkspaceFolder> GenerateFolders(int count, int maxNestingLevel = 3)
+	{
+		var folders = new List<WorkspaceFolder>();
+		var predefinedFolders = GetMockFoldersWithNesting();
 
 		for (int i = 0; i < count; i++)
 		{
@@ -136,11 +195,11 @@ public static class MockDataGenerator
 			}
 			else
 			{
-				folders.Add(GenerateRandomFolder());
+				folders.Add(GenerateRandomFolder(0, maxNestingLevel));
 			}
 		}
 
-		return folders.ToList();
+		return folders;
 	}
 
 	// Get predefined mock workspaces
@@ -171,45 +230,166 @@ public static class MockDataGenerator
 		};
 	}
 
-	// Get predefined mock folders
-	public static ImmutableList<WorkspaceFolder> GetMockFolders()
+	// Create predefined folders with realistic nesting structure
+	public static ImmutableList<WorkspaceFolder> GetMockFoldersWithNesting()
 	{
-		var workspaces = GetMockWorkspaces();
-
-		// Create Google folder with Google workspaces
+		// Level 1: Google Services
 		var googleWorkspaces = new List<Workspace>
 		{
-			Workspace.CreateSingle("ws-gmail-1",
-								   new AppInfo("gmail-1", "Gmail Personal", "https://mail.google.com", BrandColors.Gmail)),
-			Workspace.CreateSingle("ws-gmail-2",
-								   new AppInfo("gmail-2", "Gmail Work", "https://mail.google.com/mail/u/1", BrandColors.Gmail)),
-			Workspace.CreateSingle("ws-calendar",
-								   new AppInfo("calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar)),
-			Workspace.CreateSingle("ws-drive",
-								   new AppInfo("drive", "Drive", "https://drive.google.com", BrandColors.Drive))
+			Workspace.CreateSingle("ws-gmail-1", new AppInfo("gmail-1", "Gmail Personal", "https://mail.google.com", BrandColors.Gmail)),
+			Workspace.CreateSingle("ws-calendar", new AppInfo("calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar)),
 		};
 
-		// Create Communication folder
-		var commWorkspaces = workspaces.Where(w =>
-												  w.Name.Contains("Slack") || w.Name.Contains("Discord") ||
-												  w.Name.Contains("Communication")).ToList();
+		// Level 2: Google nested folders
+		var googleDriveFolder = new WorkspaceFolder(
+													"folder-google-drive", "Drive & Docs", WorkspaceFolder.FolderType.SIDEBAR,
+													new List<Workspace>
+													{
+														Workspace.CreateSingle("ws-drive",
+																			   new AppInfo("drive", "Drive", "https://drive.google.com",
+																						   BrandColors.Drive)),
+														Workspace.CreateSingle("ws-docs",
+																			   new AppInfo("docs", "Docs", "https://docs.google.com", "#4285f4"))
+													}.ToImmutableList(),
+													ImmutableList<WorkspaceFolder>.Empty
+												   );
 
-		// Create Productivity folder
-		var prodWorkspaces = workspaces.Where(w =>
-												  w.Name.Contains("Notion") || w.Name.Contains("GitHub") ||
-												  w.Name.Contains("Productivity")).ToList();
+		var googleWorkFolder = new WorkspaceFolder(
+												   "folder-google-work", "Work Tools", WorkspaceFolder.FolderType.SIDEBAR,
+												   new List<Workspace>
+												   {
+													   Workspace.CreateSingle("ws-gmail-work",
+																			  new AppInfo("gmail-work", "Gmail Work",
+																						  "https://mail.google.com/mail/u/1", BrandColors.Gmail)),
+													   Workspace.CreateSingle("ws-meet",
+																			  new AppInfo("meet", "Meet", "https://meet.google.com",
+																						  BrandColors.Meet))
+												   }.ToImmutableList(),
+												   // Level 3: Nested work categories
+												   new List<WorkspaceFolder>
+												   {
+													   new WorkspaceFolder("folder-analytics", "Analytics", WorkspaceFolder.FolderType.DROPDOWN,
+																		   new List<Workspace>
+																		   {
+																			   Workspace.CreateSingle("ws-analytics",
+																									  new AppInfo("analytics", "Analytics",
+																												  "https://analytics.google.com",
+																												  "#ff6f00"))
+																		   }.ToImmutableList(),
+																		   ImmutableList<WorkspaceFolder>.Empty)
+												   }.ToImmutableList()
+												  );
+
+		// Level 1: Development folder with deep nesting
+		var frontendFolder = new WorkspaceFolder(
+												 "folder-frontend", "Frontend", WorkspaceFolder.FolderType.SIDEBAR,
+												 new List<Workspace>
+												 {
+													 Workspace.CreateSingle("ws-figma",
+																			new AppInfo("figma", "Figma", "https://figma.com", BrandColors.Figma))
+												 }.ToImmutableList(),
+												 // Level 3: Tools within frontend
+												 new List<WorkspaceFolder>
+												 {
+													 new WorkspaceFolder("folder-design-systems", "Design Systems",
+																		 WorkspaceFolder.FolderType.DROPDOWN,
+																		 new List<Workspace>
+																		 {
+																			 Workspace.CreateSingle("ws-storybook",
+																									new AppInfo("storybook", "Storybook",
+																												"https://storybook.js.org",
+																												"#ff4785"))
+																		 }.ToImmutableList(),
+																		 ImmutableList<WorkspaceFolder>.Empty)
+												 }.ToImmutableList()
+												);
+
+		var backendFolder = new WorkspaceFolder(
+												"folder-backend", "Backend", WorkspaceFolder.FolderType.SIDEBAR,
+												new List<Workspace>
+												{
+													Workspace.CreateSingle("ws-github",
+																		   new AppInfo("github", "GitHub", "https://github.com", BrandColors.GitHub))
+												}.ToImmutableList(),
+												ImmutableList<WorkspaceFolder>.Empty
+											   );
+
+		var developmentFolder = new WorkspaceFolder(
+													"folder-development", "Development", WorkspaceFolder.FolderType.SIDEBAR,
+													ImmutableList<Workspace>.Empty,
+													new List<WorkspaceFolder> { frontendFolder, backendFolder }.ToImmutableList()
+												   );
+
+		// Level 1: Communication with nested structure
+		var teamCommFolder = new WorkspaceFolder(
+												 "folder-team-comm", "Team Communication", WorkspaceFolder.FolderType.SIDEBAR,
+												 new List<Workspace>
+												 {
+													 Workspace.CreateSingle("ws-slack",
+																			new AppInfo("slack", "Slack", "https://slack.com", BrandColors.Slack)),
+													 Workspace.CreateSingle("ws-teams",
+																			new AppInfo("teams", "Teams", "https://teams.microsoft.com",
+																						BrandColors.Teams))
+												 }.ToImmutableList(),
+												 // Level 3: Project-specific channels
+												 new List<WorkspaceFolder>
+												 {
+													 new WorkspaceFolder("folder-project-alpha", "Project Alpha", WorkspaceFolder.FolderType.SIDEBAR,
+																		 new List<Workspace>
+																		 {
+																			 Workspace.CreateSingle("ws-alpha-slack",
+																									new AppInfo("alpha-slack", "Alpha Slack",
+																												"https://alpha.slack.com",
+																												BrandColors.Slack))
+																		 }.ToImmutableList(),
+																		 // Level 4: Sub-project channels
+																		 new List<WorkspaceFolder>
+																		 {
+																			 new WorkspaceFolder("folder-alpha-dev", "Alpha Development",
+																								 WorkspaceFolder.FolderType.DROPDOWN,
+																								 new List<Workspace>
+																								 {
+																									 Workspace.CreateSingle("ws-alpha-dev",
+																															new AppInfo("alpha-dev",
+																																		"Dev Channel",
+																																		"https://alpha-dev.slack.com",
+																																		BrandColors
+																																			.Slack))
+																								 }.ToImmutableList(),
+																								 ImmutableList<WorkspaceFolder>.Empty)
+																		 }.ToImmutableList())
+												 }.ToImmutableList()
+												);
+
+		var communicationFolder = new WorkspaceFolder(
+													  "folder-communication", "Communication", WorkspaceFolder.FolderType.SIDEBAR,
+													  new List<Workspace>
+													  {
+														  Workspace.CreateSingle("ws-discord",
+																				 new AppInfo("discord", "Discord", "https://discord.com",
+																							 BrandColors.Discord))
+													  }.ToImmutableList(),
+													  new List<WorkspaceFolder> { teamCommFolder }.ToImmutableList()
+													 );
+
+		// Main Google folder with nested structure
+		var googleFolder = new WorkspaceFolder(
+											   "folder-google", "Google Services", WorkspaceFolder.FolderType.SIDEBAR,
+											   googleWorkspaces.ToImmutableList(),
+											   new List<WorkspaceFolder> { googleDriveFolder, googleWorkFolder }.ToImmutableList()
+											  );
 
 		return ImmutableList.Create(
-									WorkspaceFolder.Create("folder-google", "Google",
-														   WorkspaceFolder.FolderType.DROPDOWN_COLLAPSABLE,
-														   null, null, googleWorkspaces.ToArray()),
-									WorkspaceFolder.Create("folder-communication", "Communication",
-														   WorkspaceFolder.FolderType.DROPDOWN,
-														   null, null, commWorkspaces.ToArray()),
-									WorkspaceFolder.Create("folder-productivity", "Productivity",
-														   WorkspaceFolder.FolderType.SIDEBAR,
-														   null, null, prodWorkspaces.ToArray())
+									googleFolder,
+									developmentFolder,
+									communicationFolder
 								   );
+	}
+
+	// Get predefined mock folders (simple version without nesting)
+	public static ImmutableList<WorkspaceFolder> GetMockFolders()
+	{
+		return GetMockFoldersWithNesting();
 	}
 
 	// Get mock auth profiles
@@ -228,6 +408,16 @@ public static class MockDataGenerator
 							   }
 							  ),
 			AuthProfile.Create(
+							   "google-work",
+							   "Work Google",
+							   AuthProfile.Providers.Google,
+							   new Dictionary<string, string>
+							   {
+								   ["email"] = "work@company.com",
+								   ["token"] = "encrypted_token_work"
+							   }
+							  ),
+			AuthProfile.Create(
 							   "microsoft-main",
 							   "Microsoft Account",
 							   AuthProfile.Providers.Microsoft,
@@ -235,6 +425,26 @@ public static class MockDataGenerator
 							   {
 								   ["email"] = "user@outlook.com",
 								   ["token"] = "encrypted_token_ms"
+							   }
+							  ),
+			AuthProfile.Create(
+							   "slack-team",
+							   "Team Slack",
+							   AuthProfile.Providers.Slack,
+							   new Dictionary<string, string>
+							   {
+								   ["workspace"] = "team-workspace",
+								   ["token"] = "encrypted_token_slack"
+							   }
+							  ),
+			AuthProfile.Create(
+							   "github-main",
+							   "GitHub Account",
+							   AuthProfile.Providers.Custom,
+							   new Dictionary<string, string>
+							   {
+								   ["username"] = "developer",
+								   ["token"] = "encrypted_token_github"
 							   }
 							  )
 		};
@@ -253,11 +463,26 @@ public static class MockDataGenerator
 	}
 
 	// Generate app state with specific counts
-	public static AppCollectionState GenerateAppState(int folderCount, int workspaceCount)
+	public static AppCollectionState GenerateAppState(int folderCount, int workspaceCount, int maxNestingLevel = 3)
 	{
-		return new AppCollectionState(Folders: GenerateFolders(folderCount).ToImmutableList(),
+		return new AppCollectionState(
+									  Folders: GenerateFolders(folderCount, maxNestingLevel).ToImmutableList(),
 									  Workspaces: GenerateRandomWorkspaces(workspaceCount).ToImmutableList(),
 									  Profiles: GetMockAuthProfiles()
 									 );
+	}
+
+	// Generate sample notification settings
+	public static ImmutableList<NotificationSettings> GetMockNotificationSettings()
+	{
+		var workspaces = GetMockWorkspaces();
+		return workspaces.Select(ws => new NotificationSettings(
+																WorkspaceId: ws.Id,
+																Enabled: ws.Name.Contains("Gmail") || ws.Name.Contains("Slack"),
+																PlaySound: ws.Name.Contains("Slack"),
+																CustomSound: ws.Name.Contains("Slack") ? "slack-notification.mp3" : null,
+																ShowBadge: true,
+																ShowDesktopNotification: true
+															   )).ToImmutableList();
 	}
 }

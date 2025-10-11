@@ -8,7 +8,7 @@ public class WorkspaceFolder(
 	string name,
 	WorkspaceFolder.FolderType type,
 	ImmutableList<Workspace> workspaces,
-	ImmutableList<WorkspaceFolder> folders,
+	ImmutableList<WorkspaceFolder> subFolders,
 	string? customIconPath = null,
 	string? defaultIconPath = null)
 	: ISidebarItem
@@ -17,7 +17,7 @@ public class WorkspaceFolder(
 	public string Name { get; set; } = name;
 	public FolderType Type { get; set; } = type;
 	public ImmutableList<Workspace> Workspaces { get; set; } = workspaces;
-	public ImmutableList<WorkspaceFolder> Folders { get; set; } = folders;
+	public ImmutableList<WorkspaceFolder> SubFolders { get; set; } = subFolders;
 	public string? CustomIconPath { get; set; } = customIconPath;
 	public string? DefaultIconPath { get; set; } = defaultIconPath;
 	public int Order { get; set; } = Random.Shared.Next(0, 100);
@@ -32,6 +32,12 @@ public class WorkspaceFolder(
 			return new IconInfo(DefaultIconPath, IconType.Default);
 
 		return new IconInfo(IconConstants.DefaultFolderIcon, IconType.SystemDefault);
+	}
+
+	public bool TryGetWorkspace(string workspaceId, out Workspace? workspace)
+	{
+		workspace = Workspaces.FirstOrDefault(w => w.Id == workspaceId);
+		return workspace is not null;
 	}
 
 	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN,
