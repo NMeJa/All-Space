@@ -4,6 +4,13 @@
 <MudLayout>
     <div class="app-container-grid @GetGridClass()">
         <div class="sidebar-area">
+            <MudSelect @bind-Value="direction" Label="Direction">
+                @foreach (var dir in Enum.GetValues(typeof(Direction)).Cast<Direction>())
+                {
+                    <MudSelectItem Value="@dir">@dir.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+
             <MudStack Row="@IsHorizontalLayout" Reverse="@IsReverse" Spacing="1">
                 @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i)))
                 {
@@ -25,10 +32,12 @@
                 }
             </MudStack>
         </div>
+
         <div class="webview-area">
             @* <ASWebview ActiveWorkspace="@activeWorkspace" *@
             @*            ActiveWorkspaceId="@activeWorkspaceId"/> *@
         </div>
+        
     </div>
 </MudLayout>
 
