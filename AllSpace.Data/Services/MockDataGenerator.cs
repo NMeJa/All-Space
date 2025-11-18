@@ -90,7 +90,7 @@ public static class MockDataGenerator
 	// Generate random workspace (with 1-3 apps)
 	public static Workspace GenerateRandomWorkspace()
 	{
-		var id = $"ws-{Guid.NewGuid():N}";
+		var id = Guid.NewGuid();
 		var appCount = random.Next(1, 4); // 1 to 3 apps
 		var apps = GenerateRandomApps(appCount);
 
@@ -99,7 +99,7 @@ public static class MockDataGenerator
 					   ? apps[0].Name
 					   : $"Workspace {random.Next(1, 1000)}";
 
-		return new Workspace(id, name, apps);
+		return new Workspace(id, name);
 	}
 
 	// Generate multiple random workspaces
@@ -215,18 +215,18 @@ public static class MockDataGenerator
 		return new List<Workspace>
 		{
 			// Single app workspaces
-			Workspace.CreateSingle("ws-gmail", gmailApp),
-			Workspace.CreateSingle("ws-slack", slackApp),
-			Workspace.CreateSingle("ws-notion", notionApp),
-			Workspace.CreateSingle("ws-github", githubApp),
-			Workspace.CreateSingle("ws-discord", discordApp),
-
-			// Multi-app workspace (for side-by-side view)
-			Workspace.CreateMulti("ws-productivity", "Productivity Suite",
-								  null, null, notionApp, githubApp),
-
-			Workspace.CreateMulti("ws-communication", "Communication Hub",
-								  null, null, slackApp, discordApp)
+			// Workspace.CreateSingle("ws-gmail", gmailApp),
+			// Workspace.CreateSingle("ws-slack", slackApp),
+			// Workspace.CreateSingle("ws-notion", notionApp),
+			// Workspace.CreateSingle("ws-github", githubApp),
+			// Workspace.CreateSingle("ws-discord", discordApp),
+			//
+			// // Multi-app workspace (for side-by-side view)
+			// Workspace.CreateMulti("ws-productivity", "Productivity Suite",
+			// 					  null, null, notionApp, githubApp),
+			//
+			// Workspace.CreateMulti("ws-communication", "Communication Hub",
+			// 					  null, null, slackApp, discordApp)
 		};
 	}
 
@@ -236,8 +236,8 @@ public static class MockDataGenerator
 		// Level 1: Google Services
 		var googleWorkspaces = new List<Workspace>
 		{
-			Workspace.CreateSingle("ws-gmail-1", new AppInfo("gmail-1", "Gmail Personal", "https://mail.google.com", BrandColors.Gmail)),
-			Workspace.CreateSingle("ws-calendar", new AppInfo("calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar)),
+			// Workspace.CreateSingle("ws-gmail-1", new AppInfo("gmail-1", "Gmail Personal", "https://mail.google.com", BrandColors.Gmail)),
+			// Workspace.CreateSingle("ws-calendar", new AppInfo("calendar", "Calendar", "https://calendar.google.com", BrandColors.Calendar)),
 		};
 
 		// Level 2: Google nested folders
@@ -245,11 +245,11 @@ public static class MockDataGenerator
 													"folder-google-drive", "Drive & Docs", WorkspaceFolder.FolderType.SIDEBAR,
 													new List<Workspace>
 													{
-														Workspace.CreateSingle("ws-drive",
-																			   new AppInfo("drive", "Drive", "https://drive.google.com",
-																						   BrandColors.Drive)),
-														Workspace.CreateSingle("ws-docs",
-																			   new AppInfo("docs", "Docs", "https://docs.google.com", "#4285f4"))
+														// Workspace.CreateSingle("ws-drive",
+														// 					   new AppInfo("drive", "Drive", "https://drive.google.com",
+														// 								   BrandColors.Drive)),
+														// Workspace.CreateSingle("ws-docs",
+														// 					   new AppInfo("docs", "Docs", "https://docs.google.com", "#4285f4"))
 													}.ToImmutableList(),
 													ImmutableList<WorkspaceFolder>.Empty
 												   );
@@ -258,12 +258,12 @@ public static class MockDataGenerator
 												   "folder-google-work", "Work Tools", WorkspaceFolder.FolderType.SIDEBAR,
 												   new List<Workspace>
 												   {
-													   Workspace.CreateSingle("ws-gmail-work",
-																			  new AppInfo("gmail-work", "Gmail Work",
-																						  "https://mail.google.com/mail/u/1", BrandColors.Gmail)),
-													   Workspace.CreateSingle("ws-meet",
-																			  new AppInfo("meet", "Meet", "https://meet.google.com",
-																						  BrandColors.Meet))
+													   // Workspace.CreateSingle("ws-gmail-work",
+													   // 			  new AppInfo("gmail-work", "Gmail Work",
+													   // 						  "https://mail.google.com/mail/u/1", BrandColors.Gmail)),
+													   // Workspace.CreateSingle("ws-meet",
+													   // 			  new AppInfo("meet", "Meet", "https://meet.google.com",
+													   // 						  BrandColors.Meet))
 												   }.ToImmutableList(),
 												   // Level 3: Nested work categories
 												   new List<WorkspaceFolder>
@@ -271,10 +271,10 @@ public static class MockDataGenerator
 													   new WorkspaceFolder("folder-analytics", "Analytics", WorkspaceFolder.FolderType.DROPDOWN,
 																		   new List<Workspace>
 																		   {
-																			   Workspace.CreateSingle("ws-analytics",
-																									  new AppInfo("analytics", "Analytics",
-																												  "https://analytics.google.com",
-																												  "#ff6f00"))
+																			   // Workspace.CreateSingle("ws-analytics",
+																			   // 			  new AppInfo("analytics", "Analytics",
+																			   // 						  "https://analytics.google.com",
+																			   // 						  "#ff6f00"))
 																		   }.ToImmutableList(),
 																		   ImmutableList<WorkspaceFolder>.Empty)
 												   }.ToImmutableList()
@@ -285,8 +285,8 @@ public static class MockDataGenerator
 												 "folder-frontend", "Frontend", WorkspaceFolder.FolderType.SIDEBAR,
 												 new List<Workspace>
 												 {
-													 Workspace.CreateSingle("ws-figma",
-																			new AppInfo("figma", "Figma", "https://figma.com", BrandColors.Figma))
+													 // Workspace.CreateSingle("ws-figma",
+													 // 					new AppInfo("figma", "Figma", "https://figma.com", BrandColors.Figma))
 												 }.ToImmutableList(),
 												 // Level 3: Tools within frontend
 												 new List<WorkspaceFolder>
@@ -295,10 +295,10 @@ public static class MockDataGenerator
 																		 WorkspaceFolder.FolderType.DROPDOWN,
 																		 new List<Workspace>
 																		 {
-																			 Workspace.CreateSingle("ws-storybook",
-																									new AppInfo("storybook", "Storybook",
-																												"https://storybook.js.org",
-																												"#ff4785"))
+																			 // Workspace.CreateSingle("ws-storybook",
+																			 // 					new AppInfo("storybook", "Storybook",
+																			 // 								"https://storybook.js.org",
+																			 // 								"#ff4785"))
 																		 }.ToImmutableList(),
 																		 ImmutableList<WorkspaceFolder>.Empty)
 												 }.ToImmutableList()
@@ -308,8 +308,8 @@ public static class MockDataGenerator
 												"folder-backend", "Backend", WorkspaceFolder.FolderType.SIDEBAR,
 												new List<Workspace>
 												{
-													Workspace.CreateSingle("ws-github",
-																		   new AppInfo("github", "GitHub", "https://github.com", BrandColors.GitHub))
+													// Workspace.CreateSingle("ws-github",
+													// 					   new AppInfo("github", "GitHub", "https://github.com", BrandColors.GitHub))
 												}.ToImmutableList(),
 												ImmutableList<WorkspaceFolder>.Empty
 											   );
@@ -325,11 +325,11 @@ public static class MockDataGenerator
 												 "folder-team-comm", "Team Communication", WorkspaceFolder.FolderType.SIDEBAR,
 												 new List<Workspace>
 												 {
-													 Workspace.CreateSingle("ws-slack",
-																			new AppInfo("slack", "Slack", "https://slack.com", BrandColors.Slack)),
-													 Workspace.CreateSingle("ws-teams",
-																			new AppInfo("teams", "Teams", "https://teams.microsoft.com",
-																						BrandColors.Teams))
+													 // Workspace.CreateSingle("ws-slack",
+													 // 					new AppInfo("slack", "Slack", "https://slack.com", BrandColors.Slack)),
+													 // Workspace.CreateSingle("ws-teams",
+													 // 					new AppInfo("teams", "Teams", "https://teams.microsoft.com",
+													 // 								BrandColors.Teams))
 												 }.ToImmutableList(),
 												 // Level 3: Project-specific channels
 												 new List<WorkspaceFolder>
@@ -337,10 +337,10 @@ public static class MockDataGenerator
 													 new WorkspaceFolder("folder-project-alpha", "Project Alpha", WorkspaceFolder.FolderType.SIDEBAR,
 																		 new List<Workspace>
 																		 {
-																			 Workspace.CreateSingle("ws-alpha-slack",
-																									new AppInfo("alpha-slack", "Alpha Slack",
-																												"https://alpha.slack.com",
-																												BrandColors.Slack))
+																			 // Workspace.CreateSingle("ws-alpha-slack",
+																			 // 					new AppInfo("alpha-slack", "Alpha Slack",
+																			 // 								"https://alpha.slack.com",
+																			 // 								BrandColors.Slack))
 																		 }.ToImmutableList(),
 																		 // Level 4: Sub-project channels
 																		 new List<WorkspaceFolder>
@@ -349,12 +349,12 @@ public static class MockDataGenerator
 																								 WorkspaceFolder.FolderType.DROPDOWN,
 																								 new List<Workspace>
 																								 {
-																									 Workspace.CreateSingle("ws-alpha-dev",
-																															new AppInfo("alpha-dev",
-																																		"Dev Channel",
-																																		"https://alpha-dev.slack.com",
-																																		BrandColors
-																																			.Slack))
+																									 // Workspace.CreateSingle("ws-alpha-dev",
+																									 // 					new AppInfo("alpha-dev",
+																									 // 								"Dev Channel",
+																									 // 								"https://alpha-dev.slack.com",
+																									 // 								BrandColors
+																									 // 									.Slack))
 																								 }.ToImmutableList(),
 																								 ImmutableList<WorkspaceFolder>.Empty)
 																		 }.ToImmutableList())
@@ -365,9 +365,9 @@ public static class MockDataGenerator
 													  "folder-communication", "Communication", WorkspaceFolder.FolderType.SIDEBAR,
 													  new List<Workspace>
 													  {
-														  Workspace.CreateSingle("ws-discord",
-																				 new AppInfo("discord", "Discord", "https://discord.com",
-																							 BrandColors.Discord))
+														  // Workspace.CreateSingle("ws-discord",
+														  // 				 new AppInfo("discord", "Discord", "https://discord.com",
+														  // 							 BrandColors.Discord))
 													  }.ToImmutableList(),
 													  new List<WorkspaceFolder> { teamCommFolder }.ToImmutableList()
 													 );

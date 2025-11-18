@@ -1,0 +1,20 @@
+﻿<MudButtonGroup Vertical="@(!IsHorizontal)" Variant="Variant.Filled" DropShadow="true">
+    <DeckSidebarButton Workspace="@(new Workspace(Guid.NewGuid(), "New 1") { Icon = new("fa fa-house") })"/>
+    <DeckSidebarButton Workspace="@(new Workspace(Guid.NewGuid(), "New 2") { Icon = new("fa fa-house") })"/>
+    <DeckSidebarButton Workspace="@(new Workspace(Guid.NewGuid(), "New 3") { Icon = new("fa fa-house") })"/>
+    <DeckSidebarButton Workspace="@(new Workspace(Guid.NewGuid(), "New 4") { Icon = new("fa fa-house") })"/>
+
+    @* @foreach (var item in items) *@
+    @* { *@
+    @*     switch (item) *@
+    @*     { *@
+    @*         case Workspace workspace: *@
+    @*             <DeckSidebarButton OnClick="@(() => SelectWorkspace(workspace))" Icon="@workspace.GetIcon()"/> *@
+    @*             break; *@
+    @*         case WorkspaceFolder folder: *@
+    @*             $1$ <DeckSidebarButton OnClick=""/> #1# *@
+    @*             break; *@
+    @*     } *@
+    @* } *@
+
+</MudButtonGroup>

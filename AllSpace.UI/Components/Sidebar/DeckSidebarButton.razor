@@ -1,0 +1,57 @@
+﻿<MudTooltip Text="@Workspace.Name">
+    <MudButton OnClick="@HandleClick" Class="@("ma-1 " + (Workspace.IsActive ? "btn-state active" : "btn-state"))">
+        @{
+            var iconInfo = Workspace.Icon;
+            if (iconInfo is null)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Error"/>
+                return;
+            }
+
+            var icon = iconInfo.Value;
+            if (icon.Type is IconType.SvgOrFont)
+            {
+                <MudIcon Icon="@icon.PathOrName"/>
+            }
+            else
+            {
+                <MudImage Src="@icon.PathOrName"/>
+            }
+        }
+
+        @ChildContent
+    </MudButton>
+</MudTooltip>
+
+@code {
+    [Parameter] public Workspace Workspace { get; set; } = default!;
+    [Parameter] public EventCallback<Workspace> OnClick { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync(Workspace);
+    }
+
+}
+
+<style>
+    .btn-state {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        transition: border-radius 0.2s;
+        display: flex;
+    }
+
+    .btn-state:hover {
+        border-radius: 16px;
+        background-color: #007bff;
+    }
+
+    .btn-state.active {
+        border-radius: 16px;
+        background-color: #007bff;
+    }
+</style>

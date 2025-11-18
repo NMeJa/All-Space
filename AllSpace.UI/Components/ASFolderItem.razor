@@ -20,10 +20,10 @@
             <MudButton OnClick="@HandleToggle" Class="pa-0 ma-0">
                 <MudPaper Class="pa-2 folder-item" Elevation="0"
                           Width="55" Height="55">
-                    @if (icon.Type != IconType.SystemDefault)
+                    @if (icon.Type != IconType.Image)
                     {
                         //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
-                        <AsyncIcon IconPath="@icon.Path"
+                        <AsyncIcon IconPath="@icon.PathOrName"
                                    Class="folder-icon"
                                    Title="@Folder.Name"/>
                     }
@@ -31,24 +31,7 @@
                     {
                         <!-- Grid showing workspace icons -->
                         <div Class="folder-grid">
-                            @foreach (var workspace in Workspaces.Take(4))
-                            {
-                                var wsIcon = workspace.GetIcon();
-                                if (wsIcon.Type != IconType.SystemDefault)
-                                {
-                                    //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
-                                    <AsyncIcon IconPath="@icon.Path"
-                                               Class="workspace-icon-mini"
-                                               Title="@workspace.Name"/>
-                                }
-                                else
-                                {
-                                    <div class="workspace-placeholder"
-                                         style="background-color: @workspace.BackgroundColor;">
-                                        <span class="workspace-initial-mini">@workspace.Name[..1]</span>
-                                    </div>
-                                }
-                            }
+                            @foreach (var workspace in Workspaces.Take(4)) { }
                         </div>
                     }
                 </MudPaper>
@@ -73,24 +56,8 @@
                     <MudTooltip Text="@workspace.Name" Placement="Placement.Right" Arrow="true">
                         <MudButton OnClick="@(() => HandleWorkspaceClick(workspace))"
                                    Class="pa-0 ma-0 workspace-button">
-                            <MudPaper Class="workspace-item-mini" Elevation="0"
-                                      Style="@($"background-color: {workspace.BackgroundColor}")">
+                            <MudPaper Class="workspace-item-mini" Elevation="0">
                                 @{
-                                    var wsIcon = workspace.GetIcon();
-                                    if (wsIcon.Type != IconType.SystemDefault)
-                                    {
-                                        //TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage
-                                        <AsyncIcon IconPath="@icon.Path"
-                                                   Class="workspace-icon-expanded"
-                                                   Title="@workspace.Name"/>
-                                    }
-                                    else
-                                    {
-                                        <div class="workspace-placeholder"
-                                             style="background-color: @workspace.BackgroundColor;">
-                                            <span class="workspace-initial-mini">@workspace.Name[..1]</span>
-                                        </div>
-                                    }
                                 }
                             </MudPaper>
                         </MudButton>

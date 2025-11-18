@@ -26,19 +26,19 @@ public class WorkspaceFolder(
 	public IconInfo GetIcon()
 	{
 		if (!string.IsNullOrEmpty(CustomIconPath) && File.Exists(CustomIconPath))
-			return new IconInfo(CustomIconPath, IconType.Custom);
+			return new IconInfo(CustomIconPath, IconType.Image);
 
 		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
-			return new IconInfo(DefaultIconPath, IconType.Default);
+			return new IconInfo(DefaultIconPath, IconType.Image);
 
-		return new IconInfo(IconConstants.DefaultFolderIcon, IconType.SystemDefault);
+		return new IconInfo(IconConstants.DefaultFolderIcon, IconType.Image);
 	}
 
-	public bool TryGetWorkspace(string workspaceId, out Workspace? workspace)
-	{
-		workspace = Workspaces.FirstOrDefault(w => w.Id == workspaceId);
-		return workspace is not null;
-	}
+	// public bool TryGetWorkspace(string workspaceId, out Workspace? workspace)
+	// {
+	// 	workspace = Workspaces.FirstOrDefault(w => w.Id == workspaceId);
+	// 	return workspace is not null;
+	// }
 
 	public static WorkspaceFolder Create(string id, string name, FolderType type = FolderType.DROPDOWN,
 										 string? customIconPath = null,
@@ -63,7 +63,7 @@ public class WorkspaceFolder(
 
 	public WorkspaceFolder RemoveWorkspace(string workspaceId)
 	{
-		Workspaces = Workspaces.RemoveAll(w => w.Id == workspaceId);
+		// Workspaces = Workspaces.RemoveAll(w => w.Id == workspaceId);
 		return this;
 	}
 

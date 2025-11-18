@@ -14,15 +14,15 @@ public record AppInfo(
 	public IconInfo GetIcon()
 	{
 		if (!string.IsNullOrEmpty(CustomIconPath) && File.Exists(CustomIconPath))
-			return new IconInfo(CustomIconPath, IconType.Custom);
+			return new IconInfo(CustomIconPath, IconType.Image);
 
 		if (!string.IsNullOrEmpty(FaviconPath) && File.Exists(FaviconPath))
-			return new IconInfo(FaviconPath, IconType.Favicon);
+			return new IconInfo(FaviconPath, IconType.Image);
 
 		if (!string.IsNullOrEmpty(DefaultIconPath) && File.Exists(DefaultIconPath))
-			return new IconInfo(DefaultIconPath, IconType.Default);
+			return new IconInfo(DefaultIconPath, IconType.Image);
 
-		return new IconInfo(IconConstants.DefaultAppIcon, IconType.SystemDefault);
+		return new IconInfo(IconConstants.DefaultAppIcon, IconType.Image);
 	}
 
 

@@ -1,9 +1,8 @@
 ﻿<MudItem Class="ma-0 pa-0 flex-shrink-0 flex-grow-0" Fixed="true" Gutters="false">
     <MudButton OnClick="@HandleClick" Class="pa-0">
-        <MudPaper Class="@GetWorkspaceClass()" Elevation="0" Width="55" Height="55"
-                  Style="@($"background-color: {Workspace.BackgroundColor}")">
+        <MudPaper Class="@GetWorkspaceClass()" Elevation="0" Width="55" Height="55">
             <!-- TODO add the case when it is not svg but some other type which is not supported by MudIcon. In that case use MudImage -->
-            <AsyncIcon IconPath="@icon.Path"
+            <AsyncIcon IconPath="@icon.PathOrName"
                        Class="workspace-icon"
                        Title="@Workspace.Name"/>
         </MudPaper>
@@ -17,10 +16,7 @@
 
     private IconInfo icon;
 
-    protected override void OnParametersSet()
-    {
-        icon = Workspace.GetIcon();
-    }
+    protected override void OnParametersSet() { }
 
     private string GetWorkspaceClass()
     {

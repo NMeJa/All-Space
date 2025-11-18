@@ -1,17 +1,11 @@
 ﻿namespace AllSpace.Domain.Models;
 
-public record struct IconInfo(
-	string Path, // Local file path
-	IconType Type,
-	byte[]? Data = null // Optional: icon data if needed
-	);
+public record struct IconInfo(string PathOrName, IconType Type = IconType.SvgOrFont);
 
 public enum IconType
 {
-	Custom,       // User-selected custom icon
-	Favicon,      // Auto-fetched from the website
-	Default,      // Random from default icon pack
-	SystemDefault // System default icon
+	SvgOrFont,
+	Image,
 }
 
 public static class IconConstants

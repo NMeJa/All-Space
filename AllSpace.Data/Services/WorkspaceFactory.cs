@@ -19,7 +19,7 @@ public class WorkspaceFactory(IIconService iconService)
 						   DefaultIconPath: defaultIconPath);
 	}
 
-	public Workspace CreateWorkspace(string id, string name, params AppInfo[] apps)
+	public Workspace CreateWorkspace(Guid id, string name, params AppInfo[] apps)
 	{
 		// Assign a random default icon for multi-app workspaces
 		string? defaultIconPath = null;
@@ -28,8 +28,7 @@ public class WorkspaceFactory(IIconService iconService)
 			defaultIconPath = iconService.GetRandomDefaultIcon();
 		}
 
-		return new Workspace(id, name, apps.ToImmutableList(),
-							 defaultIconPath: defaultIconPath);
+		return new Workspace(id, name);
 	}
 
 	public WorkspaceFolder CreateFolder(string id, string name,

@@ -1,7 +1,7 @@
 ﻿namespace AllSpace.Domain.Models;
 
 public record NotificationSettings(
-	string WorkspaceId,
+	Guid WorkspaceId,
 	bool Enabled,
 	bool PlaySound,
 	string? CustomSound = null,

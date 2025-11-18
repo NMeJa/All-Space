@@ -11,25 +11,27 @@
                 }
             </MudSelect>
 
-            <MudStack Row="@IsHorizontalLayout" Reverse="@IsReverse" Spacing="1">
-                @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i)))
-                {
-                    var index = sidebars.Count - i - 1;
-                    var sidebarId = GetSidebarId(barFolder, index);
-                    var state = GetOrCreateSidebarState(sidebarId);
+            <MudStack Row="@IsHorizontal" Reverse="@IsReverse" Spacing="1">
+                <DeckSidebar IsHorizontal="@IsHorizontal"/>
 
-                    <ASSidebar @key="@sidebarId"
-                               IsHorizontal="@IsHorizontalLayout"
-                               SidebarId="@sidebarId"
-                               State="@state"
-                               NestingOrder="@index"
-                               Folder="@barFolder"
-                               ActiveWorkspaceId="@activeWorkspaceId"
-                               OnWorkspaceClick="ChangeWorkspace"
-                               OnAddWorkspace="AddWorkspace"
-                               OnSidebarFolderOpen="AddSidebar"
-                               OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/>
-                }
+                @* @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i))) *@
+                @* { *@
+                @*     var index = sidebars.Count - i - 1; *@
+                @*     var sidebarId = GetSidebarId(barFolder, index); *@
+                @*     var state = GetOrCreateSidebarState(sidebarId); *@
+                @* *@
+                @*     $1$ <ASSidebar @key="@sidebarId" #1# *@
+                @*     $1$            IsHorizontal="@IsHorizontalLayout" #1# *@
+                @*     $1$            SidebarId="@sidebarId" #1# *@
+                @*     $1$            State="@state" #1# *@
+                @*     $1$            NestingOrder="@index" #1# *@
+                @*     $1$            Folder="@barFolder" #1# *@
+                @*     $1$            ActiveWorkspaceId="@activeWorkspaceId" #1# *@
+                @*     $1$            OnWorkspaceClick="ChangeWorkspace" #1# *@
+                @*     $1$            OnAddWorkspace="AddWorkspace" #1# *@
+                @*     $1$            OnSidebarFolderOpen="AddSidebar" #1# *@
+                @*     $1$            OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/> #1# *@
+                @* } *@
             </MudStack>
         </div>
 
@@ -37,13 +39,13 @@
             @* <ASWebview ActiveWorkspace="@activeWorkspace" *@
             @*            ActiveWorkspaceId="@activeWorkspaceId"/> *@
         </div>
-        
+
     </div>
 </MudLayout>
 
 @code {
-    private Direction direction = Direction.DOWN;
-    private bool IsHorizontalLayout => direction is Direction.UP or Direction.DOWN;
+    private Direction direction = Direction.LEFT;
+    private bool IsHorizontal => direction is Direction.UP or Direction.DOWN;
     private bool IsReverse => direction is Direction.LEFT or Direction.UP;
 
     private string GetGridClass()

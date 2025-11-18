@@ -51,7 +51,7 @@ public partial class MainLayout : LayoutComponentBase
 	private void ChangeWorkspace(Workspace workspace)
 	{
 		activeWorkspace = workspace;
-		activeWorkspaceId = workspace.Id;
+		// activeWorkspaceId = workspace.Id;
 		StateHasChanged();
 	}
 

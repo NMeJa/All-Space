@@ -8,13 +8,13 @@ public record WorkspaceConfig(
 	DateTime CreatedAt,
 	DateTime ModifiedAt)
 {
-	public static WorkspaceConfig Create(Workspace item)
-		=> new(Guid.NewGuid().ToString(),
-			   item,
-			   new NotificationSettings(item.Id, true, true),
-			   new Dictionary<string, string>().AsReadOnly(),
-			   DateTime.UtcNow,
-			   DateTime.UtcNow);
+	// public static WorkspaceConfig Create(Workspace item)
+	// 	=> new(Guid.NewGuid().ToString(),
+	// 		   item,
+	// 		   new NotificationSettings(item.Id, true, true),
+	// 		   new Dictionary<string, string>().AsReadOnly(),
+	// 		   DateTime.UtcNow,
+	// 		   DateTime.UtcNow);
 
 	public WorkspaceConfig UpdateSettings(Dictionary<string, string> settings)
 		=> this with
