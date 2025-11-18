@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Bit.BlazorUI" Version="10.0.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2"/>
         <PackageReference Include="MudBlazor" Version="8.13.0"/>
         <PackageReference Include="Photino.Blazor" Version="4.0.13"/>
