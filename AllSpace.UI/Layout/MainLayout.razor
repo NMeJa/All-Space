@@ -1,48 +1,60 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
-<BitToggle Label="Hide Nav Panel" @bind-Value="hide"/>
+<BitToggle Label="Hide Nav Panel" @bind-Value="Hide"/>
 <MudSelect @bind-Value="direction" Label="Direction">
     @foreach (var dir in Enum.GetValues(typeof(Direction)).Cast<Direction>())
     {
         <MudSelectItem Value="@dir">@dir.ToString()</MudSelectItem>
     }
 </MudSelect>
-<BitLayout HideNavPanel="hide" ReverseNavPanel="IsReverse">
+<MudIcon Icon="@Icons.Material.Filled._1k"></MudIcon>
+
+<BitLayout HideNavPanel="Hide" ReverseNavPanel="IsReverse">
     <NavPanel>
         <BitStack Horizontal="IsHorizontalLayout" Reversed="IsReverse">
-            @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i)))
-            {
-                var index = sidebars.Count - i - 1;
-                var sidebarId = GetSidebarId(barFolder, index);
-                var state = GetOrCreateSidebarState(sidebarId);
-
-                <ASSidebar @key="@sidebarId"
-                           IsHorizontal="@IsHorizontalLayout"
-                           SidebarId="@sidebarId"
-                           State="@state"
-                           NestingOrder="@index"
-                           Folder="@barFolder"
-                           ActiveWorkspaceId="@activeWorkspaceId"
-                           OnWorkspaceClick="ChangeWorkspace"
-                           OnAddWorkspace="AddWorkspace"
-                           OnSidebarFolderOpen="AddSidebar"
-                           OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/>
-            }
+            <BitNavBar Items="items"></BitNavBar>
+            @* @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i))) *@
+            @* { *@
+            @*     var index = sidebars.Count - i - 1; *@
+            @*     var sidebarId = GetSidebarId(barFolder, index); *@
+            @*     var state = GetOrCreateSidebarState(sidebarId); *@
+            @* *@
+            @*     <ASSidebar @key="@sidebarId" *@
+            @*                IsHorizontal="@IsHorizontalLayout" *@
+            @*                SidebarId="@sidebarId" *@
+            @*                State="@state" *@
+            @*                NestingOrder="@index" *@
+            @*                Folder="@barFolder" *@
+            @*                ActiveWorkspaceId="@activeWorkspaceId" *@
+            @*                OnWorkspaceClick="ChangeWorkspace" *@
+            @*                OnAddWorkspace="AddWorkspace" *@
+            @*                OnSidebarFolderOpen="AddSidebar" *@
+            @*                OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/> *@
+            @* } *@
         </BitStack>
     </NavPanel>
     <Main>
-        <div class="app-container-grid @GetGridClass()">
-            <div class="webview-area">
-                @* <ASWebview ActiveWorkspace="@activeWorkspace" *@
-                @*            ActiveWorkspaceId="@activeWorkspaceId"/> *@
-            </div>
-
-        </div>
+        @* <div class="app-container-grid @GetGridClass()"> *@
+        @*     <div class="webview-area"> *@
+        @*         $1$ <ASWebview ActiveWorkspace="@activeWorkspace" #1# *@
+        @*         $1$            ActiveWorkspaceId="@activeWorkspaceId"/> #1# *@
+        @*     </div> *@
+        @* *@
+        @* </div> *@
     </Main>
 </BitLayout>
 
 @code {
-    private bool hide;
+    private bool Hide { get; set; } = false;
+
+    private List<BitNavBarItem> items =
+    [
+        new() { Text = "Home", Class = "fas fa-house" },
+        new() { Text = "Products", Title = "asdasd" },
+        new() { Text = "Academy", IconName = BitIconName.LearningTools },
+        new() { Text = "Profile", IconName = BitIconName.Contact },
+    ];
+
     private Direction direction = Direction.DOWN;
     private bool IsHorizontalLayout => direction is Direction.UP or Direction.DOWN;
     private bool IsReverse => direction is Direction.LEFT or Direction.UP;
