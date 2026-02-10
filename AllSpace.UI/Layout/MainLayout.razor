@@ -1,47 +1,47 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
-<BitButton>Button</BitButton>
-<BitDropdown Label="Direction" Items="GetDirections()" DefaultValue="Direction.DOWN" @bind-Value="direction" Class="sidebar-area"/>
-<BitToggle Label="Hide Nav Panel" @bind-Value="Hide"/>
-@* <BitIcon Icon="@("fas fa-solid fa-house")"></BitIcon> *@
+<BitLayout HideNavPanel="NavPanelState" ReverseNavPanel="IsReverse">
+    <Header>
+        <BitDropdown Label="Direction" Items="GetDirections()"
+                     TItem="BitDropdownItem<Direction>" TValue="Direction"
+                     DefaultValue="Direction.LEFT" @bind-Value="direction"/>
+        <BitToggle Label="Hide Nav Panel" @bind-Value="NavPanelState"/>
+    </Header>
+    <NavPanel>
+        <BitStack Horizontal="IsHorizontalLayout">
+            @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i)))
+            {
+                var index = sidebars.Count - i - 1;
+                var sidebarId = GetSidebarId(barFolder, index);
+                var state = GetOrCreateSidebarState(sidebarId);
 
-@* <BitLayout HideNavPanel="Hide" ReverseNavPanel="IsReverse"> *@
-@*     <NavPanel> *@
-@*         <BitStack Horizontal="IsHorizontalLayout" Reversed="IsReverse"> *@
-@*             <BitNavBar Items="items"></BitNavBar> *@
-@*             $1$ @foreach (var (barFolder, i) in sidebars.Select((value, i) => (value, i))) #1# *@
-@*             $1$ { #1# *@
-@*             $1$     var index = sidebars.Count - i - 1; #1# *@
-@*             $1$     var sidebarId = GetSidebarId(barFolder, index); #1# *@
-@*             $1$     var state = GetOrCreateSidebarState(sidebarId); #1# *@
-@*             $1$ #1# *@
-@*             $1$     <ASSidebar @key="@sidebarId" #1# *@
-@*             $1$                IsHorizontal="@IsHorizontalLayout" #1# *@
-@*             $1$                SidebarId="@sidebarId" #1# *@
-@*             $1$                State="@state" #1# *@
-@*             $1$                NestingOrder="@index" #1# *@
-@*             $1$                Folder="@barFolder" #1# *@
-@*             $1$                ActiveWorkspaceId="@activeWorkspaceId" #1# *@
-@*             $1$                OnWorkspaceClick="ChangeWorkspace" #1# *@
-@*             $1$                OnAddWorkspace="AddWorkspace" #1# *@
-@*             $1$                OnSidebarFolderOpen="AddSidebar" #1# *@
-@*             $1$                OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/> #1# *@
-@*             $1$ } #1# *@
-@*         </BitStack> *@
-@*     </NavPanel> *@
-@*     <Main> *@
-@*         $1$ <div class="app-container-grid @GetGridClass()"> #1# *@
-@*         $1$     <div class="webview-area"> #1# *@
-@*         $1$         $2$ <ASWebview ActiveWorkspace="@activeWorkspace" #2# #1# *@
-@*         $1$         $2$            ActiveWorkspaceId="@activeWorkspaceId"/> #2# #1# *@
-@*         $1$     </div> #1# *@
-@*         $1$ #1# *@
-@*         $1$ </div> #1# *@
-@*     </Main> *@
-@* </BitLayout> *@
+                <ASSidebar @key="@sidebarId"
+                           IsHorizontal="@IsHorizontalLayout"
+                           SidebarId="@sidebarId"
+                           State="@state"
+                           NestingOrder="@index"
+                           Folder="@barFolder"
+                           ActiveWorkspaceId="@activeWorkspaceId"
+                           OnWorkspaceClick="ChangeWorkspace"
+                           OnAddWorkspace="AddWorkspace"
+                           OnSidebarFolderOpen="AddSidebar"
+                           OnStateChanged="@(newState => UpdateSidebarState(sidebarId, newState))"/>
+            }
+        </BitStack>
+    </NavPanel>
+    <Main>
+        @* <div class="app-container-grid @GetGridClass()"> *@
+        @*     <div class="webview-area"> *@
+        @*         $1$ <ASWebview ActiveWorkspace="@activeWorkspace" #1# *@
+        @*         $1$            ActiveWorkspaceId="@activeWorkspaceId"/> #1# *@
+        @*     </div> *@
+        @* *@
+        @* </div> *@
+    </Main>
+</BitLayout>
 
 @code {
-    private bool Hide { get; set; } = false;
+    private bool NavPanelState { get; set; } = false;
 
     private List<BitNavBarItem> items =
     [
@@ -53,7 +53,7 @@
 
     private Direction direction = Direction.DOWN;
     private bool IsHorizontalLayout => direction is Direction.UP or Direction.DOWN;
-    private bool IsReverse => direction is Direction.LEFT or Direction.UP;
+    private bool IsReverse => direction is Direction.RIGHT or Direction.UP;
 
     private string GetGridClass()
     {
@@ -68,7 +68,7 @@
         DOWN
     }
 
-    private static List<BitDropdownItem<Enum>> GetDirections() => new()
+    private static List<BitDropdownItem<Direction>> GetDirections() => new()
     {
         new() { ItemType = BitDropdownItemType.Header, Text = "Horizontal" },
         new() { Text = "Left", Value = Direction.LEFT },
