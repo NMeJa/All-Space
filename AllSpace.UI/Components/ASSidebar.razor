@@ -1,4 +1,5 @@
-﻿@implements IAsyncDisposable
+﻿@using System.Drawing
+@implements IAsyncDisposable
 @inject IJSRuntime JsRuntime
 
 <MudPaper Class="@GetSidebarClass()" Elevation="0">
@@ -36,10 +37,10 @@
                   AlignItems="AlignItems.Center"
                   Row="@IsHorizontal"
                   Class="@GetBottomClass()">
-            <MudIconButton Icon="@Icons.Material.Filled.Add"
-                           Class="action-button"
-                           Size="Size.Large"
-                           OnClick="@AddWorkspace"/>
+            <BitButton Icon="@("fas fa-chisel fa-regular fa-plus")"
+                       Class="action-button"
+                       Size="BitSize.Large"
+                       OnClick="@AddWorkspace"/>
             <ASUserProfile/>
         </MudStack>
     }

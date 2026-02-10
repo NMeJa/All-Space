@@ -3,7 +3,6 @@ using AllSpace.Data;
 using AllSpace.Security;
 using AllSpace.UI;
 using Microsoft.Extensions.DependencyInjection;
-using MudBlazor.Services;
 using Photino.Blazor;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -17,7 +16,6 @@ internal class Program
 
 		// Add services
 		builder.Services.AddLogging();
-		builder.Services.AddMudServices();
 
 		//Services from Other connected projects
 		builder.Services.AddData();
